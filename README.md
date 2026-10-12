@@ -36,6 +36,10 @@ Open the `https://….vercel.app` link on the phone and use "Add to Home Screen"
   - Resize and rotate with the sliders, or resize with the mouse wheel.
   - Copy, bring to front, or remove (the <kbd>Delete</kbd> key works too).
   - Placed stickers are included in the saved and shared photo.
+- **Custom stickers:**
+  - **📷 Upload any picture** and it becomes a die-cut sticker. Transparent PNG cut-outs get a white outline that follows their shape; ordinary photos get a white rounded border.
+  - Uploaded stickers are kept in Cache Storage (`maheen-stickers-v1`) under **my stickers**, ready to reuse next time. Hover or tap the × to remove one.
+  - **✍ Type words or emoji** in one of 6 colours to make a text sticker.
 - **The cats:** **Miso** (light orange tabby), **Gina** (sleepy white Persian, with blue eyes when she wakes up), and **Blackie** (the black cat peeking over the camera, whose eyes follow your cursor). Tap them to see what they say.
 - **Saved in Cache Storage** (`maheen-photos-v1`) automatically; browse, share, or delete them in the album.
 - **WhatsApp:** on phones, the native share sheet opens with the photo attached. On desktop, the photo downloads and WhatsApp opens so you can attach it.

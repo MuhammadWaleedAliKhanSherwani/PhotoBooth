@@ -1,6 +1,6 @@
 /* Service worker: makes the booth work offline & installable.
    Photos live in their own cache ('maheen-photos-v1') which is never touched here. */
-const SHELL = 'maheen-shell-v3';
+const SHELL = 'maheen-shell-v4';
 const ASSETS = [
   './',
   './index.html',

@@ -747,10 +747,118 @@
     });
   })();
 
-  function addSticker(kind) {
+  /* ---- custom stickers: uploaded pictures (kept in the cache) & typed text ---- */
+  const myStickers = $('#my-stickers');
+  const myEmpty = $('#my-empty');
+  const TEXT_COLORS = ['#e3557f', '#6b4428', '#5f8a43', '#d9622b', '#2f2a28', '#7c5cbf'];
+  let textColor = TEXT_COLORS[0];
+
+  async function blobToDrawable(blob) {
+    if (window.createImageBitmap) {
+      try { return await createImageBitmap(blob); } catch { /* fall through */ }
+    }
+    const url = URL.createObjectURL(blob);
+    try {
+      return await new Promise((res, rej) => { const im = new Image(); im.onload = () => res(im); im.onerror = rej; im.src = url; });
+    } finally {
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+    }
+  }
+
+  function addMyStickerButton(id, canvasLike) {
+    const kind = `u:${id}`;
+    CUSTOM_STICKERS.set(kind, canvasLike);
+    const wrap = document.createElement('div');
+    wrap.className = 'st-mine';
+    wrap.dataset.kind = kind;
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'st-btn';
+    b.title = 'My sticker';
+    b.setAttribute('aria-label', 'Add my sticker');
+    const c = makeCanvas(72, 72);
+    drawSticker(c.getContext('2d'), kind, 36, 36, 60, 0);
+    b.appendChild(c);
+    b.addEventListener('click', () => addSticker(kind, 1.3));
+    const del = document.createElement('button');
+    del.type = 'button';
+    del.className = 'st-del';
+    del.textContent = '×';
+    del.title = 'Remove from my stickers';
+    del.setAttribute('aria-label', 'Remove from my stickers');
+    del.addEventListener('click', async () => {
+      if (!confirm('Remove this from your stickers? (It stays on photos you already made.)')) return;
+      await StickerStore.remove(id);
+      wrap.remove();
+      myEmpty.hidden = !!myStickers.querySelector('.st-mine');
+    });
+    wrap.append(b, del);
+    myStickers.insertBefore(wrap, myEmpty.nextSibling);
+    myEmpty.hidden = true;
+  }
+
+  (async function loadMyStickers() {
+    const items = await StickerStore.list().catch(() => []);
+    for (const item of items.reverse()) {
+      try { addMyStickerButton(item.id, await blobToDrawable(item.blob)); } catch { /* skip broken */ }
+    }
+  })();
+
+  $('#st-upload').addEventListener('change', async (e) => {
+    const files = [...e.target.files].filter((f) => f.type.startsWith('image/'));
+    e.target.value = '';
+    let added = 0;
+    for (const file of files) {
+      try {
+        const img = await blobToDrawable(file);
+        const sticker = makeImageSticker(img, img.width, img.height);
+        const id = Date.now() + added;
+        const blob = await new Promise((r) => sticker.toBlob(r, 'image/png'));
+        if (blob) await StickerStore.save(id, blob).catch(() => {});
+        addMyStickerButton(id, sticker);
+        if (session?.base) addSticker(`u:${id}`, 1.3);
+        added++;
+      } catch {
+        toast("Couldn't read that picture 😿");
+      }
+    }
+    if (added) toast(added > 1 ? `${added} new stickers made ♡` : 'New sticker made ♡ it\'s saved in "my stickers"');
+  });
+
+  (function buildTextColors() {
+    const box = $('#text-colors');
+    TEXT_COLORS.forEach((col, i) => {
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'tc' + (i === 0 ? ' active' : '');
+      b.style.background = col;
+      b.setAttribute('role', 'radio');
+      b.setAttribute('aria-checked', i === 0);
+      b.setAttribute('aria-label', `Text colour ${i + 1}`);
+      b.addEventListener('click', () => {
+        textColor = col;
+        $$('.tc', box).forEach((x) => { x.classList.toggle('active', x === b); x.setAttribute('aria-checked', x === b); });
+      });
+      box.appendChild(b);
+    });
+  })();
+
+  $('#text-sticker-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const input = $('#st-text');
+    const text = input.value.trim();
+    if (!text || !session?.base) return;
+    await fontsReady;
+    const kind = `t:${Date.now()}`;
+    CUSTOM_STICKERS.set(kind, makeTextSticker(text, textColor, filterById(session.filter).group === 'retro' || session.mode === 'retro'));
+    addSticker(kind, 2.2);
+    input.value = '';
+  });
+
+  function addSticker(kind, scale = 1) {
     if (!session?.base) return;
     const { width: W, height: H } = session.base;
-    const unit = Math.min(W, H) * 0.2;
+    const unit = Math.min(W, H) * 0.2 * scale;
     const n = session.custom.length;
     session.custom.push({
       kind,

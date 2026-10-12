@@ -550,12 +550,113 @@ const STICKER_PALETTE = [
   { kind: 'cassette', label: 'Mixtape' },
 ];
 
+/* custom stickers (uploaded pictures, typed text) are ready-made die-cut canvases, keyed 'u:<id>' / 't:<id>' */
+const CUSTOM_STICKERS = new Map();
+
 function drawSticker(ctx, kind, x, y, size, rot, rng) {
   ctx.save();
   ctx.translate(x, y);
   ctx.rotate(rot);
-  (STICKERS[kind] || stHeart)(ctx, size, rng || Math.random);
+  const img = CUSTOM_STICKERS.get(kind);
+  if (img) {
+    const k = (size * 1.05) / Math.max(img.width, img.height);
+    ctx.drawImage(img, (-img.width * k) / 2, (-img.height * k) / 2, img.width * k, img.height * k);
+  } else {
+    (STICKERS[kind] || stHeart)(ctx, size, rng || Math.random);
+  }
   ctx.restore();
+}
+
+/** does this picture have see-through parts (a PNG cut-out) worth outlining? */
+function hasTransparency(img, w, h) {
+  const c = makeCanvas(64, 64);
+  const x = c.getContext('2d', { willReadFrequently: true });
+  x.drawImage(img, 0, 0, w, h, 0, 0, 64, 64);
+  const d = x.getImageData(0, 0, 64, 64).data;
+  let clear = 0;
+  for (let i = 3; i < d.length; i += 4) if (d[i] < 200) clear++;
+  return clear > 64 * 64 * 0.03;
+}
+
+/** turn any picture into a die-cut sticker: cut-outs get a white outline hugging their shape,
+    ordinary photos get a white rounded border. Returns a canvas with transparent surroundings. */
+function makeImageSticker(img, srcW, srcH) {
+  const k = Math.min(1, 480 / Math.max(srcW, srcH));
+  const iw = Math.max(1, Math.round(srcW * k)), ih = Math.max(1, Math.round(srcH * k));
+  const border = Math.max(6, Math.round(Math.max(iw, ih) * 0.035));
+  const pad = border * 3;
+  const c = makeCanvas(iw + pad * 2, ih + pad * 2);
+  const ctx = c.getContext('2d');
+
+  if (hasTransparency(img, srcW, srcH)) {
+    // white silhouette, stamped in a ring to grow it outwards → outline that follows the shape
+    const sil = makeCanvas(c.width, c.height);
+    const sx = sil.getContext('2d');
+    sx.drawImage(img, pad, pad, iw, ih);
+    sx.globalCompositeOperation = 'source-in';
+    sx.fillStyle = '#fff';
+    sx.fillRect(0, 0, sil.width, sil.height);
+    const ring = makeCanvas(c.width, c.height);
+    const rx = ring.getContext('2d');
+    for (let i = 0; i < 24; i++) {
+      const a = (i / 24) * TAU;
+      rx.drawImage(sil, Math.cos(a) * border, Math.sin(a) * border);
+    }
+    rx.drawImage(sil, 0, 0);
+    ctx.save();
+    ctx.shadowColor = 'rgba(60,40,20,.28)';
+    ctx.shadowBlur = border * 1.2;
+    ctx.shadowOffsetY = border * 0.4;
+    ctx.drawImage(ring, 0, 0);
+    ctx.restore();
+    ctx.drawImage(img, pad, pad, iw, ih);
+  } else {
+    const r = Math.min(iw, ih) * 0.08;
+    ctx.save();
+    ctx.shadowColor = 'rgba(60,40,20,.28)';
+    ctx.shadowBlur = border * 1.2;
+    ctx.shadowOffsetY = border * 0.4;
+    ctx.fillStyle = '#fff';
+    ctx.beginPath();
+    roundRectPath(ctx, pad - border, pad - border, iw + border * 2, ih + border * 2, r + border);
+    ctx.fill();
+    ctx.restore();
+    ctx.save();
+    ctx.beginPath();
+    roundRectPath(ctx, pad, pad, iw, ih, r);
+    ctx.clip();
+    ctx.drawImage(img, pad, pad, iw, ih);
+    ctx.restore();
+  }
+  return c;
+}
+
+/** typed words / emoji as a puffy die-cut sticker */
+function makeTextSticker(text, color, retro) {
+  const size = 110;
+  const font = retro ? `${size}px "Righteous", "Fredoka", sans-serif` : `${size}px "Pacifico", "Fredoka", cursive`;
+  const m = makeCanvas(10, 10).getContext('2d');
+  m.font = font;
+  const tw = Math.ceil(m.measureText(text).width);
+  const pad = 40;
+  const c = makeCanvas(tw + pad * 2, size * 1.9 + pad);
+  const ctx = c.getContext('2d');
+  ctx.font = font;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.lineJoin = 'round';
+  const cx = c.width / 2, cy = c.height / 2;
+  ctx.save();
+  ctx.shadowColor = 'rgba(60,40,20,.28)';
+  ctx.shadowBlur = 14;
+  ctx.shadowOffsetY = 5;
+  ctx.lineWidth = 30;
+  ctx.strokeStyle = '#fff';
+  ctx.strokeText(text, cx, cy);
+  ctx.restore();
+  ctx.fillStyle = color;
+  ctx.fillText(text, cx, cy);
+  return c;
 }
 
 /** user-placed stickers: [{ kind, x, y, size, rot, seed }] */

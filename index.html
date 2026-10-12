@@ -358,6 +358,20 @@
         <div class="result-block">
           <h4>Add your own stickers <small>tap one, then drag it around the photo</small></h4>
           <div class="sticker-palette" id="sticker-palette"></div>
+          <div class="my-stickers-head">
+            <span>my stickers</span>
+            <label class="btn ghost small upload-sticker">📷 upload picture
+              <input type="file" id="st-upload" accept="image/*" multiple hidden />
+            </label>
+          </div>
+          <div class="sticker-palette mine" id="my-stickers">
+            <p class="my-empty" id="my-empty">Upload any picture — a pet, a doodle, a PNG cut-out — and it becomes a sticker you can reuse anytime ♡</p>
+          </div>
+          <form class="text-sticker" id="text-sticker-form" autocomplete="off">
+            <input type="text" id="st-text" maxlength="24" placeholder="✍ type words or emoji…" aria-label="Text for a sticker" />
+            <div class="text-colors" id="text-colors" role="radiogroup" aria-label="Text colour"></div>
+            <button type="submit" class="btn ghost small">add</button>
+          </form>
           <div class="sticker-edit" id="sticker-edit" hidden>
             <label class="slider">Size <input type="range" id="st-size" min="0.3" max="3" step="0.05" /></label>
             <label class="slider">Turn <input type="range" id="st-rot" min="-180" max="180" step="1" /></label>

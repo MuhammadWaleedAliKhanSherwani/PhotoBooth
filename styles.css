@@ -803,3 +803,57 @@ kbd { background: var(--card); border: 1px solid var(--line); border-bottom-widt
 .sticker-edit-actions { display: flex; flex-wrap: wrap; gap: 6px; }
 #st-clear { margin-top: 8px; }
 #result-canvas.has-stickers { touch-action: none; cursor: default; }
+
+/* ---------- custom stickers ---------- */
+.my-stickers-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin: 12px 0 6px;
+  font-size: .85rem;
+  color: var(--muted);
+  font-weight: 600;
+}
+.upload-sticker { cursor: pointer; }
+.sticker-palette.mine { min-height: 20px; }
+.my-empty { grid-column: 1 / -1; margin: 0; font-size: .8rem; color: var(--muted); line-height: 1.3; }
+.st-mine { position: relative; display: grid; }
+.st-mine .st-btn { border-style: dashed; }
+.st-del {
+  position: absolute;
+  top: -6px; right: -6px;
+  width: 20px; height: 20px;
+  border-radius: 50%;
+  border: 0;
+  background: var(--ink);
+  color: #fff;
+  font-size: 14px;
+  line-height: 20px;
+  padding: 0;
+  opacity: 0;
+  transition: opacity .15s;
+}
+.st-mine:hover .st-del, .st-mine:focus-within .st-del { opacity: 1; }
+@media (hover: none) { .st-del { opacity: .85; } }
+.text-sticker {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-top: 10px;
+}
+.text-sticker input {
+  flex: 1 1 160px;
+  min-width: 0;
+  padding: 8px 12px;
+  border-radius: 12px;
+  border: 2px solid var(--line);
+  background: var(--bg);
+  color: var(--ink);
+  outline: none;
+}
+.text-sticker input:focus { border-color: var(--accent); }
+.text-colors { display: flex; gap: 5px; }
+.tc { width: 22px; height: 22px; border-radius: 50%; border: 2px solid #fff; box-shadow: 0 0 0 1px var(--line); padding: 0; }
+.tc.active { box-shadow: 0 0 0 2px var(--accent-2); transform: scale(1.12); }
