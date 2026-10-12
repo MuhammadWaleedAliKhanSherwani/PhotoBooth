@@ -19,6 +19,8 @@
     badge: $('#shot-badge'),
     tray: $('#shot-tray'),
     filterList: $('#filter-list'),
+    filterTabs: $('#filter-tabs'),
+    resultTabs: $('#result-tabs'),
     layoutList: $('#layout-list'),
     frameList: $('#frame-list'),
     caption: $('#caption'),
@@ -65,6 +67,7 @@
     busy: false,
     cancel: false,
     shotIndex: 0,
+    filterTab: 'cute',
   };
   const persist = () => {
     const { mode, filterByMode, frameByMode, layout, caption, timer, stickers, sound, mirror } = state;
@@ -223,6 +226,7 @@
     document.body.classList.toggle('retro', state.mode === 'retro');
     $$('.mode-toggle button').forEach((b) => b.classList.toggle('active', b.dataset.mode === state.mode));
     document.querySelector('meta[name="theme-color"]').content = state.mode === 'retro' ? '#f4e4c1' : '#f6efe3';
+    state.filterTab = curFilter().group;
     buildFilterChips();
     buildFrames(els.frameList, curFrame(), (id) => { state.frameByMode[state.mode] = id; persist(); refreshPanelNames(); buildLayouts(); });
     buildLayouts();
@@ -277,10 +281,26 @@
     return { b, c };
   }
 
+  /** tab row: ♡ Cute · ☀ Natural · 📷 Dazz · 📼 Retro */
+  function buildTabs(container, active, onPick) {
+    container.innerHTML = '';
+    FILTER_GROUPS.forEach((g) => {
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.role = 'tab';
+      b.className = 'tab' + (g.id === active ? ' active' : '');
+      b.setAttribute('aria-selected', g.id === active);
+      b.textContent = g.label;
+      b.addEventListener('click', () => onPick(g.id));
+      container.appendChild(b);
+    });
+  }
+
   function buildFilterChips() {
+    buildTabs(els.filterTabs, state.filterTab, (tab) => { state.filterTab = tab; buildFilterChips(); });
     els.filterList.innerHTML = '';
     thumbCanvases = [];
-    FILTERS.filter((f) => f.group === state.mode).forEach((f) => {
+    FILTERS.filter((f) => f.group === state.filterTab).forEach((f) => {
       const { b, c } = chipEl(f, f.id === curFilter().id, (id) => {
         state.filterByMode[state.mode] = id;
         persist();
@@ -567,6 +587,7 @@
       id: Date.now(),
       shots,
       layout: state.layout,
+      mode: state.mode,
       filter: curFilter().id,
       frame: curFrame(),
       stickers: state.stickers,
@@ -584,24 +605,23 @@
     chime();
   }
 
-  function buildResultControls() {
+  function buildResultFilters(tab) {
+    buildTabs(els.resultTabs, tab, buildResultFilters);
     els.resultFilters.innerHTML = '';
     const shot = session.shots[0];
-    ['cute', 'retro'].forEach((group) => {
-      const label = document.createElement('div');
-      label.className = 'chip-label';
-      label.textContent = group === 'cute' ? '♡ cute' : '📼 retro';
-      els.resultFilters.appendChild(label);
-      FILTERS.filter((f) => f.group === group).forEach((f) => {
-        const { b, c } = chipEl(f, f.id === session.filter, (id) => {
-          session.filter = id;
-          $$('.chip', els.resultFilters).forEach((x) => x.classList.toggle('active', x.dataset.id === id));
-          renderResult();
-        }, [64, 48]);
-        renderFiltered(shot, shot.width, shot.height, c.width, c.height, f, { target: c });
-        els.resultFilters.appendChild(b);
-      });
+    FILTERS.filter((f) => f.group === tab).forEach((f) => {
+      const { b, c } = chipEl(f, f.id === session.filter, (id) => {
+        session.filter = id;
+        $$('.chip', els.resultFilters).forEach((x) => x.classList.toggle('active', x.dataset.id === id));
+        renderResult();
+      }, [64, 48]);
+      renderFiltered(shot, shot.width, shot.height, c.width, c.height, f, { target: c, seed: 1 });
+      els.resultFilters.appendChild(b);
     });
+  }
+
+  function buildResultControls() {
+    buildResultFilters(filterById(session.filter).group);
     buildFrames(els.resultFrames, session.frame, (id) => { session.frame = id; renderResult(); });
     els.resultStickers.checked = session.stickers;
     els.resultCaption.value = session.caption;
@@ -611,7 +631,9 @@
     const token = ++renderToken;
     await fontsReady;
     if (token !== renderToken || !session) return;
-    const s = { ...session, retro: filterById(session.filter).group === 'retro' };
+    // retro filters always get the retro print style; cute ones never; the rest follow the booth mode
+    const group = filterById(session.filter).group;
+    const s = { ...session, retro: group === 'retro' || (group !== 'cute' && session.mode === 'retro') };
     els.resultModal.classList.add('rendering');
     await wait(16); // let the spinner paint
     const out = compose(session.shots, s);
