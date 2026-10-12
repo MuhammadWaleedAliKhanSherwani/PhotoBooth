@@ -1,0 +1,346 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Maheen's Photobooth ♡</title>
+  <meta name="description" content="A tiny photobooth made with love for Maheen — cats, matcha & hazelnut lattes included." />
+  <meta name="theme-color" content="#f6efe3" />
+  <link rel="icon" href="icon.svg" type="image/svg+xml" />
+  <link rel="apple-touch-icon" href="icon.svg" />
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600&family=Fredoka:wght@400;500;600&family=Pacifico&family=Righteous&family=VT323&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="floaties" id="floaties" aria-hidden="true"></div>
+
+  <header class="site-header">
+    <h1 class="title">Maheen's Photobooth</h1>
+    <p class="subtitle" id="greeting">hi pretty ♡</p>
+    <div class="mode-toggle" role="group" aria-label="Booth mode">
+      <button type="button" data-mode="cute" class="active">♡ Cute</button>
+      <button type="button" data-mode="retro">📼 Retro</button>
+      <span class="mode-pill" aria-hidden="true"></span>
+    </div>
+  </header>
+
+  <div class="page">
+    <!-- ======= left side: orange kitty + iced matcha ======= -->
+    <aside class="side side-left" aria-hidden="true">
+      <svg class="cat cat-sit" viewBox="0 0 200 262" role="img">
+        <g class="tail">
+          <path d="M146 228 C 196 222, 204 170, 182 146 C 172 135, 158 142, 166 152 C 184 172, 176 206, 136 210 Z" fill="#f2b880" stroke="#d98f52" stroke-width="3" stroke-linejoin="round"/>
+        </g>
+        <ellipse cx="100" cy="196" rx="62" ry="58" fill="#f2b880"/>
+        <ellipse cx="100" cy="208" rx="34" ry="40" fill="#fff4e6"/>
+        <path d="M48 180 q10 4 14 -2 M46 200 q10 4 14 -2 M152 180 q-10 4 -14 -2 M154 200 q-10 4 -14 -2" stroke="#d98f52" stroke-width="4" fill="none" stroke-linecap="round"/>
+        <g class="head">
+          <path d="M50 80 L58 20 L94 52 Z" fill="#f2b880"/>
+          <path d="M60 68 L64 36 L84 54 Z" fill="#f7a1b5"/>
+          <path d="M150 80 L142 20 L106 52 Z" fill="#f2b880"/>
+          <path d="M140 68 L136 36 L116 54 Z" fill="#f7a1b5"/>
+          <ellipse cx="100" cy="90" rx="58" ry="48" fill="#f2b880"/>
+          <path d="M92 47 l4 14 M100 44 l0 16 M108 47 l-4 14" stroke="#d98f52" stroke-width="4" stroke-linecap="round"/>
+          <g class="eyes">
+            <ellipse cx="78" cy="92" rx="8" ry="10" fill="#3b2416"/>
+            <circle cx="81" cy="88" r="3" fill="#fff"/>
+            <ellipse cx="122" cy="92" rx="8" ry="10" fill="#3b2416"/>
+            <circle cx="125" cy="88" r="3" fill="#fff"/>
+          </g>
+          <ellipse cx="64" cy="108" rx="10" ry="6" fill="#f7a1b5" opacity=".75"/>
+          <ellipse cx="136" cy="108" rx="10" ry="6" fill="#f7a1b5" opacity=".75"/>
+          <path d="M95 103 h10 l-5 6 z" fill="#e37f9c"/>
+          <path d="M100 109 q-5 7 -10 2 M100 109 q5 7 10 2" stroke="#3b2416" fill="none" stroke-width="2.5" stroke-linecap="round"/>
+          <path d="M58 100 L28 94 M58 106 L28 110 M142 100 L172 94 M142 106 L172 110" stroke="#8a6248" stroke-width="2" stroke-linecap="round"/>
+          <g class="bow">
+            <path d="M128 42 l-14 -10 v20 z M128 42 l14 -10 v20 z" fill="#9cbf7a" stroke="#5f8a43" stroke-width="2" stroke-linejoin="round"/>
+            <circle cx="128" cy="42" r="5" fill="#5f8a43"/>
+          </g>
+          <g class="shades">
+            <rect x="60" y="80" width="34" height="22" rx="8" fill="#1d1613"/>
+            <rect x="106" y="80" width="34" height="22" rx="8" fill="#1d1613"/>
+            <path d="M94 88 h12 M60 86 l-10 -4 M140 86 l10 -4" stroke="#1d1613" stroke-width="4" stroke-linecap="round"/>
+            <path d="M66 86 l8 0 M112 86 l8 0" stroke="#fff" stroke-width="3" stroke-linecap="round" opacity=".7"/>
+          </g>
+        </g>
+        <ellipse cx="78" cy="250" rx="17" ry="10" fill="#f2b880" stroke="#d98f52" stroke-width="2"/>
+        <ellipse cx="122" cy="250" rx="17" ry="10" fill="#f2b880" stroke="#d98f52" stroke-width="2"/>
+      </svg>
+
+      <div class="drink">
+        <svg class="latte iced-matcha" viewBox="0 0 140 210">
+          <defs>
+            <clipPath id="cupClip"><path d="M22 52 L118 52 L107 196 Q106 202 99 202 L41 202 Q34 202 33 196 Z"/></clipPath>
+          </defs>
+          <rect class="straw" x="76" y="2" width="11" height="96" rx="5.5" fill="#f6b8c8" stroke="#e37f9c" stroke-width="2" transform="rotate(14 82 50)"/>
+          <g clip-path="url(#cupClip)">
+            <rect x="0" y="120" width="140" height="90" fill="#f6efe0"/>
+            <path d="M0 74 Q 35 66 70 74 T 140 74 V 128 Q 105 118 70 128 T 0 128 Z" fill="#9cbf7a"/>
+            <path d="M0 122 Q 35 114 70 124 T 140 124 V 134 Q 105 126 70 134 T 0 134 Z" fill="#c4d9a8"/>
+            <rect x="34" y="62" width="26" height="24" rx="6" fill="#fff" opacity=".55" transform="rotate(-12 47 74)"/>
+            <rect x="70" y="76" width="24" height="22" rx="6" fill="#fff" opacity=".5" transform="rotate(15 82 87)"/>
+            <rect x="48" y="96" width="22" height="20" rx="6" fill="#fff" opacity=".45" transform="rotate(8 59 106)"/>
+          </g>
+          <path d="M22 52 L118 52 L107 196 Q106 202 99 202 L41 202 Q34 202 33 196 Z" fill="rgba(255,255,255,.18)" stroke="#bcd0a6" stroke-width="3" stroke-linejoin="round"/>
+          <rect x="18" y="46" width="104" height="9" rx="4.5" fill="#e6f0d6" stroke="#bcd0a6" stroke-width="2"/>
+          <path d="M32 64 L40 180" stroke="#fff" stroke-width="5" stroke-linecap="round" opacity=".6"/>
+          <g class="cup-face">
+            <circle cx="58" cy="160" r="4" fill="#5b4030"/><circle cx="84" cy="160" r="4" fill="#5b4030"/>
+            <path d="M65 166 q6 6 12 0" stroke="#5b4030" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+            <ellipse cx="50" cy="168" rx="6" ry="3.5" fill="#f7a1b5"/><ellipse cx="92" cy="168" rx="6" ry="3.5" fill="#f7a1b5"/>
+          </g>
+        </svg>
+        <span class="drink-tag">iced matcha ♡</span>
+      </div>
+      <div class="paws-trail"><span>🐾</span><span>🐾</span><span>🐾</span></div>
+    </aside>
+
+    <!-- ======= the booth ======= -->
+    <main class="booth">
+      <section class="stage">
+        <div class="camera-wrap">
+          <svg class="peek-cat cat" viewBox="0 0 160 96" aria-hidden="true">
+            <path d="M28 54 L34 6 L62 32 Z" fill="#3a3330"/>
+            <path d="M36 44 L39 18 L54 32 Z" fill="#f7a1b5"/>
+            <path d="M132 54 L126 6 L98 32 Z" fill="#3a3330"/>
+            <path d="M124 44 L121 18 L106 32 Z" fill="#f7a1b5"/>
+            <path d="M22 96 Q 22 26 80 24 Q 138 26 138 96 Z" fill="#3a3330"/>
+            <g class="peek-eyes">
+              <ellipse cx="60" cy="62" rx="12" ry="13" fill="#f6d66b"/>
+              <ellipse cx="100" cy="62" rx="12" ry="13" fill="#f6d66b"/>
+              <g class="pupils">
+                <ellipse cx="60" cy="62" rx="5" ry="9" fill="#1d1613"/>
+                <ellipse cx="100" cy="62" rx="5" ry="9" fill="#1d1613"/>
+                <circle cx="63" cy="57" r="2.5" fill="#fff"/>
+                <circle cx="103" cy="57" r="2.5" fill="#fff"/>
+              </g>
+            </g>
+            <g class="shades">
+              <rect x="42" y="50" width="34" height="22" rx="8" fill="#111"/>
+              <rect x="84" y="50" width="34" height="22" rx="8" fill="#111"/>
+              <path d="M76 58 h8" stroke="#111" stroke-width="4"/>
+            </g>
+            <path d="M76 80 h8 l-4 5 z" fill="#f7a1b5"/>
+            <ellipse cx="42" cy="80" rx="8" ry="4.5" fill="#f7a1b5" opacity=".6"/>
+            <ellipse cx="118" cy="80" rx="8" ry="4.5" fill="#f7a1b5" opacity=".6"/>
+            <ellipse cx="44" cy="94" rx="16" ry="9" fill="#3a3330"/>
+            <ellipse cx="116" cy="94" rx="16" ry="9" fill="#3a3330"/>
+            <path d="M36 92 v5 M44 91 v6 M52 92 v5 M108 92 v5 M116 91 v6 M124 92 v5" stroke="#5a504c" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+
+          <div class="camera-frame" id="camera-frame">
+            <canvas id="preview" width="640" height="480" aria-label="Camera preview"></canvas>
+            <video id="video" playsinline muted autoplay></video>
+
+            <div class="cam-placeholder" id="cam-placeholder">
+              <div class="ph-cat">🐱</div>
+              <p class="ph-title">Ready for your close-up, Maheen?</p>
+              <button type="button" class="btn primary" id="btn-camera">Turn on camera</button>
+              <label class="ph-upload">or <u>pick photos from your gallery</u>
+                <input type="file" id="file-input-ph" accept="image/*" multiple hidden />
+              </label>
+              <p class="ph-error" id="cam-error" hidden></p>
+            </div>
+
+            <div class="countdown" id="countdown" aria-live="assertive"></div>
+            <div class="pose-msg" id="pose-msg"></div>
+            <div class="flash" id="flash"></div>
+            <div class="shot-badge" id="shot-badge" hidden></div>
+
+            <div class="tv-knobs" aria-hidden="true">
+              <span class="tv-brand">MAHEEN-VISION</span>
+              <span class="grille"></span>
+              <span class="knob"></span><span class="knob"></span>
+            </div>
+          </div>
+        </div>
+
+        <div class="shot-tray" id="shot-tray" aria-label="Shots taken"></div>
+
+        <div class="controls">
+          <button type="button" class="icon-btn" id="btn-flip" title="Switch camera" hidden>🔄</button>
+          <button type="button" class="icon-btn" id="btn-mirror" title="Mirror preview">🪞</button>
+          <button type="button" class="snap" id="btn-snap" title="Take photos (space)">
+            <svg viewBox="0 0 64 64" aria-hidden="true"><g fill="currentColor"><ellipse cx="32" cy="40" rx="13" ry="11"/><ellipse cx="17" cy="26" rx="6" ry="7.5"/><ellipse cx="27" cy="17" rx="6" ry="7.5"/><ellipse cx="37" cy="17" rx="6" ry="7.5"/><ellipse cx="47" cy="26" rx="6" ry="7.5"/></g></svg>
+            <span>Snap!</span>
+          </button>
+          <label class="icon-btn" title="Use photos from your device">🖼️
+            <input type="file" id="file-input" accept="image/*" multiple hidden />
+          </label>
+          <button type="button" class="icon-btn gallery-btn" id="btn-gallery" title="Album">📚<b id="gallery-count" hidden>0</b></button>
+        </div>
+        <p class="hint">tip: press <kbd>space</kbd> to snap · <kbd>esc</kbd> to cancel</p>
+      </section>
+
+      <section class="panel">
+        <div class="panel-block">
+          <h3>Filters <small id="filter-name"></small></h3>
+          <div class="chips" id="filter-list"></div>
+        </div>
+        <div class="panel-block">
+          <h3>Layouts <small id="layout-name"></small></h3>
+          <div class="layouts" id="layout-list"></div>
+        </div>
+        <div class="panel-block">
+          <h3>Frame <small id="frame-name"></small></h3>
+          <div class="swatches" id="frame-list"></div>
+        </div>
+        <div class="panel-block options">
+          <label class="field">
+            <span>Caption</span>
+            <input type="text" id="caption" maxlength="28" placeholder="Maheen ♡" />
+          </label>
+          <div class="field">
+            <span>Timer</span>
+            <div class="segmented" id="timer">
+              <button type="button" data-t="3">3s</button>
+              <button type="button" data-t="5">5s</button>
+              <button type="button" data-t="10">10s</button>
+            </div>
+          </div>
+          <label class="toggle"><input type="checkbox" id="opt-stickers" /> <i></i> Cute stickers</label>
+          <label class="toggle"><input type="checkbox" id="opt-sound" /> <i></i> Sounds</label>
+        </div>
+      </section>
+    </main>
+
+    <!-- ======= right side: sleepy kitty + hazelnut latte ======= -->
+    <aside class="side side-right" aria-hidden="true">
+      <svg class="cat cat-loaf" viewBox="0 0 240 172">
+        <path d="M205 132 C 238 150, 204 168, 150 162 C 124 159, 104 162, 84 158" stroke="#9aa0a8" stroke-width="16" fill="none" stroke-linecap="round"/>
+        <rect x="58" y="62" width="164" height="98" rx="49" fill="#b8bec6"/>
+        <path d="M150 70 q6 14 0 28 M172 70 q6 14 0 28 M194 76 q5 12 0 24" stroke="#a2a9b2" stroke-width="5" fill="none" stroke-linecap="round"/>
+        <path d="M30 70 L36 22 L70 50 Z" fill="#b8bec6"/>
+        <path d="M38 60 L41 34 L60 50 Z" fill="#f7a1b5"/>
+        <path d="M126 70 L120 22 L86 50 Z" fill="#b8bec6"/>
+        <path d="M118 60 L115 34 L96 50 Z" fill="#f7a1b5"/>
+        <ellipse cx="78" cy="92" rx="54" ry="45" fill="#b8bec6"/>
+        <ellipse cx="78" cy="132" rx="28" ry="16" fill="#eef0f3"/>
+        <g class="eyes-closed">
+          <path d="M50 92 q9 8 18 0 M88 92 q9 8 18 0" stroke="#3b3a40" stroke-width="3" fill="none" stroke-linecap="round"/>
+        </g>
+        <g class="eyes-open">
+          <circle cx="59" cy="91" r="8" fill="#3b3a40"/><circle cx="62" cy="88" r="3" fill="#fff"/>
+          <circle cx="97" cy="91" r="8" fill="#3b3a40"/><circle cx="100" cy="88" r="3" fill="#fff"/>
+        </g>
+        <g class="shades">
+          <rect x="42" y="80" width="32" height="20" rx="8" fill="#1d1613"/>
+          <rect x="82" y="80" width="32" height="20" rx="8" fill="#1d1613"/>
+          <path d="M74 88 h8" stroke="#1d1613" stroke-width="4"/>
+        </g>
+        <ellipse cx="44" cy="106" rx="9" ry="5" fill="#f7a1b5" opacity=".7"/>
+        <ellipse cx="112" cy="106" rx="9" ry="5" fill="#f7a1b5" opacity=".7"/>
+        <path d="M74 104 h8 l-4 5 z" fill="#e37f9c"/>
+        <path d="M78 109 q-4 5 -8 1 M78 109 q4 5 8 1" stroke="#3b3a40" fill="none" stroke-width="2" stroke-linecap="round"/>
+        <path d="M36 100 L8 96 M36 106 L8 110 M120 100 L148 96 M120 106 L148 110" stroke="#7d828a" stroke-width="2" stroke-linecap="round"/>
+        <ellipse cx="62" cy="156" rx="15" ry="9" fill="#eef0f3"/>
+        <ellipse cx="96" cy="158" rx="15" ry="9" fill="#eef0f3"/>
+        <text class="z z1" x="128" y="44">z</text>
+        <text class="z z2" x="144" y="30">z</text>
+        <text class="z z3" x="162" y="16">Z</text>
+      </svg>
+
+      <div class="drink">
+        <svg class="latte hazel-latte" viewBox="0 0 180 176">
+          <g class="steam" stroke="#c9a98a" stroke-width="5" fill="none" stroke-linecap="round">
+            <path class="s1" d="M62 52 q-10 -12 0 -24 q10 -12 0 -24"/>
+            <path class="s2" d="M86 50 q-10 -12 0 -24 q10 -12 0 -24"/>
+            <path class="s3" d="M110 52 q-10 -12 0 -24 q10 -12 0 -24"/>
+          </g>
+          <ellipse cx="86" cy="156" rx="78" ry="15" fill="#fffaf3" stroke="#e3cfb8" stroke-width="3"/>
+          <path d="M140 86 C 176 86, 176 130, 134 130" stroke="#f1e2cf" stroke-width="12" fill="none" stroke-linecap="round"/>
+          <path d="M28 70 L144 70 L136 140 Q134 152 120 152 L52 152 Q38 152 36 140 Z" fill="#fffaf3" stroke="#e3cfb8" stroke-width="3" stroke-linejoin="round"/>
+          <path d="M31 96 L141 96 L139 110 L33 110 Z" fill="#a8754d"/>
+          <ellipse cx="86" cy="70" rx="58" ry="12" fill="#b07a4f" stroke="#e3cfb8" stroke-width="3"/>
+          <path d="M86 78 C 70 68, 74 58, 82 60 Q 86 62 86 65 Q 86 62 90 60 C 98 58, 102 68, 86 78 Z" fill="#f3e3d1"/>
+          <g class="cup-face">
+            <circle cx="72" cy="124" r="4" fill="#5b4030"/><circle cx="100" cy="124" r="4" fill="#5b4030"/>
+            <path d="M80 130 q6 6 12 0" stroke="#5b4030" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+            <ellipse cx="62" cy="132" rx="6" ry="3.5" fill="#f7a1b5"/><ellipse cx="110" cy="132" rx="6" ry="3.5" fill="#f7a1b5"/>
+          </g>
+        </svg>
+        <span class="drink-tag">hazelnut latte ♡</span>
+      </div>
+      <div class="paws-trail"><span>🐾</span><span>🐾</span><span>🐾</span></div>
+    </aside>
+  </div>
+
+  <footer class="site-footer">made with ♡ for Maheen · official member of the matcha &amp; hazelnut club</footer>
+
+  <!-- ======= result ======= -->
+  <div class="modal" id="result-modal" hidden>
+    <div class="modal-card result-card" role="dialog" aria-modal="true" aria-label="Your photos">
+      <button type="button" class="close" data-close aria-label="Close">×</button>
+      <div class="result-preview"><canvas id="result-canvas"></canvas></div>
+      <div class="result-side">
+        <h2 class="love-note" id="love-note"></h2>
+        <div class="result-block">
+          <h4>Filter</h4>
+          <div class="chips small" id="result-filters"></div>
+        </div>
+        <div class="result-block">
+          <h4>Frame</h4>
+          <div class="swatches" id="result-frames"></div>
+        </div>
+        <div class="result-block row">
+          <label class="toggle"><input type="checkbox" id="result-stickers" /> <i></i> Stickers</label>
+          <button type="button" class="btn ghost small" id="btn-shuffle">🎲 shuffle stickers</button>
+        </div>
+        <label class="field">
+          <span>Caption</span>
+          <input type="text" id="result-caption" maxlength="28" />
+        </label>
+        <div class="actions">
+          <button type="button" class="btn whatsapp" id="btn-share">
+            <svg viewBox="0 0 32 32" aria-hidden="true"><path fill="currentColor" d="M16 3C9 3 3.3 8.6 3.3 15.6c0 2.5.7 4.8 2 6.8L3.2 29l6.8-2.1c1.9 1 4 1.6 6.1 1.6 7 0 12.7-5.7 12.7-12.7S23 3 16 3zm0 23.2c-1.9 0-3.8-.5-5.4-1.5l-.4-.2-4 1.2 1.3-3.9-.3-.4c-1.1-1.7-1.7-3.7-1.7-5.7C5.5 9.9 10.2 5.3 16 5.3s10.5 4.7 10.5 10.4S21.8 26.2 16 26.2zm5.8-7.8c-.3-.2-1.9-.9-2.2-1-.3-.1-.5-.2-.7.2-.2.3-.8 1-1 1.2-.2.2-.4.2-.7.1-.3-.2-1.3-.5-2.5-1.6-.9-.8-1.6-1.8-1.7-2.1-.2-.3 0-.5.1-.6l.5-.6c.2-.2.2-.3.3-.5.1-.2 0-.4 0-.6l-1-2.4c-.3-.6-.5-.5-.7-.5h-.6c-.2 0-.6.1-.9.4-.3.3-1.2 1.1-1.2 2.8s1.2 3.2 1.4 3.4c.2.2 2.4 3.6 5.7 5 .8.3 1.4.5 1.9.7.8.3 1.6.2 2.2.1.7-.1 1.9-.8 2.2-1.5.3-.8.3-1.4.2-1.5-.1-.2-.3-.3-.6-.4z"/></svg>
+            Share on WhatsApp
+          </button>
+          <button type="button" class="btn" id="btn-download">⬇ Download</button>
+          <button type="button" class="btn ghost" id="btn-retake">↺ Retake</button>
+        </div>
+        <p class="saved-note" id="saved-note">✓ tucked away in this browser's cache</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======= gallery ======= -->
+  <div class="modal" id="gallery-modal" hidden>
+    <div class="modal-card gallery-card" role="dialog" aria-modal="true" aria-label="Album">
+      <button type="button" class="close" data-close aria-label="Close">×</button>
+      <div class="gallery-head">
+        <h2>Maheen's little album</h2>
+        <button type="button" class="btn ghost small" id="btn-clear">clear all</button>
+      </div>
+      <p class="gallery-sub" id="gallery-sub"></p>
+      <div class="gallery-grid" id="gallery-grid"></div>
+      <div class="gallery-empty" id="gallery-empty" hidden>
+        <div class="ph-cat">😴</div>
+        <p>No photos yet — the cats are waiting for you to strike a pose.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal" id="viewer-modal" hidden>
+    <div class="modal-card viewer-card" role="dialog" aria-modal="true" aria-label="Photo">
+      <button type="button" class="close" data-close aria-label="Close">×</button>
+      <img id="viewer-img" alt="Saved photobooth picture" />
+      <div class="actions">
+        <button type="button" class="btn whatsapp" id="viewer-share">Share on WhatsApp</button>
+        <button type="button" class="btn" id="viewer-download">⬇ Download</button>
+        <button type="button" class="btn ghost danger" id="viewer-delete">🗑 Delete</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script src="js/filters.js"></script>
+  <script src="js/stickers.js"></script>
+  <script src="js/layouts.js"></script>
+  <script src="js/storage.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

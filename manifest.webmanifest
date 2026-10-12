@@ -1,0 +1,14 @@
+{
+  "name": "Maheen's Photobooth",
+  "short_name": "Photobooth ♡",
+  "description": "A tiny photobooth made with love for Maheen — cats, matcha & hazelnut lattes included.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#f8f1e6",
+  "theme_color": "#f6efe3",
+  "icons": [
+    { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }
+  ]
+}
