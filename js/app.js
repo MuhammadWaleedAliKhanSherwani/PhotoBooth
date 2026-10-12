@@ -31,7 +31,6 @@
     resultFilters: $('#result-filters'),
     resultFrames: $('#result-frames'),
     resultStickers: $('#result-stickers'),
-    resultCaption: $('#result-caption'),
     loveNote: $('#love-note'),
     savedNote: $('#saved-note'),
     galleryModal: $('#gallery-modal'),
@@ -54,6 +53,7 @@
     stickers: true,
     sound: true,
     mirror: true,
+    frameColor: '#f4c2d0',
   };
   let saved = {};
   try { saved = JSON.parse(localStorage.getItem(SETTINGS_KEY)) || {}; } catch { /* ignore */ }
@@ -70,13 +70,14 @@
     filterTab: 'cute',
   };
   const persist = () => {
-    const { mode, filterByMode, frameByMode, layout, caption, timer, stickers, sound, mirror } = state;
+    const { mode, filterByMode, frameByMode, frameColor, layout, caption, timer, stickers, sound, mirror } = state;
     try {
-      localStorage.setItem(SETTINGS_KEY, JSON.stringify({ mode, filterByMode, frameByMode, layout, caption, timer, stickers, sound, mirror }));
+      localStorage.setItem(SETTINGS_KEY, JSON.stringify({ mode, filterByMode, frameByMode, frameColor, layout, caption, timer, stickers, sound, mirror }));
     } catch { /* ignore */ }
   };
   const curFilter = () => filterById(state.filterByMode[state.mode]);
   const curFrame = () => state.frameByMode[state.mode];
+  const curTheme = () => frameFor({ frame: curFrame(), frameColor: state.frameColor });
   const curLayout = () => layoutById(state.layout);
 
   /* ---------------- sounds (all synthesised, no files) ---------------- */
@@ -229,7 +230,13 @@
     document.querySelector('meta[name="theme-color"]').content = state.mode === 'retro' ? '#f4e4c1' : '#f6efe3';
     state.filterTab = curFilter().group;
     buildFilterChips();
-    buildFrames(els.frameList, curFrame(), (id) => { state.frameByMode[state.mode] = id; persist(); refreshPanelNames(); buildLayouts(); });
+    buildFrames(els.frameList, curFrame(), state.frameColor, (id, color) => {
+      state.frameByMode[state.mode] = id;
+      if (color) state.frameColor = color;
+      persist();
+      refreshPanelNames();
+      buildLayouts();
+    });
     buildLayouts();
     refreshPanelNames();
     buildFloaties();
@@ -242,7 +249,7 @@
   function refreshPanelNames() {
     $('#filter-name').textContent = curFilter().name;
     $('#layout-name').textContent = curLayout().name;
-    $('#frame-name').textContent = frameById(curFrame()).name;
+    $('#frame-name').textContent = curTheme().name;
   }
 
   /* ---------------- filter chips with live thumbnails ---------------- */
@@ -329,8 +336,14 @@
   /* ---------------- layouts ---------------- */
   function buildLayouts() {
     els.layoutList.innerHTML = '';
-    const T = frameById(curFrame());
-    LAYOUTS.forEach((L) => {
+    const T = curTheme();
+    LAYOUTS.forEach((L, idx) => {
+      if (L.pro && !LAYOUTS[idx - 1]?.pro) {
+        const d = document.createElement('div');
+        d.className = 'layout-divider';
+        d.textContent = '✦ pro layouts';
+        els.layoutList.appendChild(d);
+      }
       const b = document.createElement('button');
       b.type = 'button';
       b.className = 'layout-card' + (L.id === state.layout ? ' active' : '');
@@ -338,7 +351,7 @@
       const mini = document.createElement('div');
       mini.className = 'mini' + (L.caption.kind === 'film' ? ' film' : '');
       mini.style.aspectRatio = `${L.w} / ${L.h}`;
-      mini.style.background = L.caption.kind === 'film' ? '#1d1613' : T.bg;
+      mini.style.background = L.caption.kind === 'film' ? '#1d1613' : L.pro && T.id === 'cream' ? '#fff' : T.bg;
       L.slots.forEach((s) => {
         const i = document.createElement('i');
         if (s.shape === 'heart') i.className = 'heart';
@@ -366,7 +379,7 @@
   }
 
   /* ---------------- frame swatches ---------------- */
-  function buildFrames(container, selected, onPick) {
+  function buildFrames(container, selected, customColor, onPick) {
     container.innerHTML = '';
     FRAMES.forEach((T) => {
       const b = document.createElement('button');
@@ -383,6 +396,31 @@
       });
       container.appendChild(b);
     });
+    container.appendChild(colorSwatch(selected === 'custom', customColor, 'Pick any frame colour', (hex) => {
+      $$('.swatch', container).forEach((x) => x.classList.toggle('active', x.classList.contains('custom')));
+      onPick('custom', hex);
+    }));
+  }
+
+  /** a rainbow swatch wrapping <input type=color>; shows the picked colour once chosen */
+  function colorSwatch(active, color, title, onInput) {
+    const l = document.createElement('label');
+    l.className = 'swatch custom' + (active ? ' active' : '');
+    l.title = title;
+    if (active && color) l.style.background = color;
+    const inp = document.createElement('input');
+    inp.type = 'color';
+    inp.value = color || '#f4c2d0';
+    inp.setAttribute('aria-label', title);
+    let t;
+    inp.addEventListener('input', () => {
+      l.style.background = inp.value;
+      clearTimeout(t);
+      t = setTimeout(() => onInput(inp.value), 120);
+    });
+    inp.addEventListener('click', () => { l.style.background = inp.value; onInput(inp.value); });
+    l.appendChild(inp);
+    return l;
   }
 
   /* ---------------- camera ---------------- */
@@ -578,7 +616,7 @@
   const fontsReady = (() => {
     if (!document.fonts?.load) return Promise.resolve();
     const all = Promise.all(
-      ['40px Pacifico', '600 40px Caveat', '40px VT323', '40px Righteous', '500 40px Fredoka'].map((f) => document.fonts.load(f))
+      ['40px Pacifico', '600 40px Caveat', '40px VT323', '40px Righteous', '500 40px Fredoka', '40px "DM Serif Display"', '600 40px Montserrat'].map((f) => document.fonts.load(f))
     ).catch(() => {});
     return Promise.race([all, wait(3000)]);
   })();
@@ -591,8 +629,12 @@
       mode: state.mode,
       filter: curFilter().id,
       frame: curFrame(),
-      stickers: state.stickers,
+      stickers: state.stickers && !layoutById(state.layout).pro,
       caption: state.caption,
+      frameColor: state.frameColor,
+      texts: {},
+      textColor: null,
+      font: 'auto',
       seed: (Math.random() * 1e9) | 0,
       date: new Date(),
       blob: null,
@@ -619,6 +661,7 @@
       const { b, c } = chipEl(f, f.id === session.filter, (id) => {
         session.filter = id;
         $$('.chip', els.resultFilters).forEach((x) => x.classList.toggle('active', x.dataset.id === id));
+        buildTextEditor();
         renderResult();
       }, [64, 48]);
       renderFiltered(shot, shot.width, shot.height, c.width, c.height, f, { target: c, seed: 1 });
@@ -628,9 +671,13 @@
 
   function buildResultControls() {
     buildResultFilters(filterById(session.filter).group);
-    buildFrames(els.resultFrames, session.frame, (id) => { session.frame = id; renderResult(); });
+    buildFrames(els.resultFrames, session.frame, session.frameColor, (id, color) => {
+      session.frame = id;
+      if (color) session.frameColor = color;
+      renderResult();
+    });
+    buildTextEditor();
     els.resultStickers.checked = session.stickers;
-    els.resultCaption.value = session.caption;
   }
 
   async function renderResult() {
@@ -704,13 +751,96 @@
     updateGalleryCount();
   }
 
-  let captionTimer;
-  els.resultCaption.addEventListener('input', () => {
-    clearTimeout(captionTimer);
-    captionTimer = setTimeout(() => {
-      session.caption = els.resultCaption.value.trim();
+  /* ---------------- text & colour editor ---------------- */
+  const INKS = ['#6b4428', '#3b2a20', '#ffffff', '#e3557f', '#5f8a43', '#d9622b', '#3b5a78', '#7c5cbf'];
+  let textTimer;
+  const rerenderSoon = () => { clearTimeout(textTimer); textTimer = setTimeout(renderResult, 300); };
+  const printStyle = () => {
+    const group = filterById(session.filter).group;
+    return { ...session, retro: group === 'retro' || (group !== 'cute' && session.mode === 'retro') };
+  };
+
+  function buildTextEditor() {
+    const L = layoutById(session.layout);
+    const s = printStyle();
+    const box = $('#text-fields');
+    box.innerHTML = '';
+    layoutTextKeys(L).forEach((key) => {
+      const f = TEXT_FIELDS[key];
+      const lab = document.createElement('label');
+      lab.className = 'field compact';
+      const span = document.createElement('span');
+      span.textContent = f.label;
+      const inp = document.createElement('input');
+      inp.type = 'text';
+      inp.maxLength = 40;
+      inp.value = txt(s, key, L);
+      inp.placeholder = '(hidden)';
+      inp.addEventListener('input', () => {
+        if (key === 'caption') session.caption = inp.value.trim();
+        else session.texts[key] = inp.value;
+        rerenderSoon();
+      });
+      lab.append(span, inp);
+      box.appendChild(lab);
+    });
+
+    const fonts = $('#font-chips');
+    fonts.innerHTML = '';
+    [['auto', 'Auto', null], ...Object.entries(FONTS).map(([id, f]) => [id, f.name, f])].forEach(([id, name, f]) => {
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'font-chip' + (session.font === id ? ' active' : '');
+      b.setAttribute('role', 'radio');
+      b.setAttribute('aria-checked', session.font === id);
+      b.textContent = name;
+      if (f) { b.style.fontFamily = f.css; if (f.w) b.style.fontWeight = f.w; }
+      b.addEventListener('click', () => {
+        session.font = id;
+        $$('.font-chip', fonts).forEach((x) => { x.classList.toggle('active', x === b); x.setAttribute('aria-checked', x === b); });
+        renderResult();
+      });
+      fonts.appendChild(b);
+    });
+
+    const inks = $('#ink-swatches');
+    inks.innerHTML = '';
+    const pickInk = (el, color) => {
+      session.textColor = color;
+      $$('.swatch', inks).forEach((x) => x.classList.toggle('active', x === el));
       renderResult();
-    }, 350);
+    };
+    const auto = document.createElement('button');
+    auto.type = 'button';
+    auto.className = 'swatch auto' + (!session.textColor ? ' active' : '');
+    auto.title = 'Automatic (matches the frame)';
+    auto.textContent = 'A';
+    auto.addEventListener('click', () => pickInk(auto, null));
+    inks.appendChild(auto);
+    INKS.forEach((col) => {
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'swatch' + (session.textColor === col ? ' active' : '');
+      b.style.background = col;
+      b.title = col;
+      b.addEventListener('click', () => pickInk(b, col));
+      inks.appendChild(b);
+    });
+    const custom = colorSwatch(session.textColor && !INKS.includes(session.textColor), session.textColor, 'Pick any text colour', (hex) => {
+      session.textColor = hex;
+      $$('.swatch', inks).forEach((x) => x.classList.toggle('active', x === custom));
+      rerenderSoon();
+    });
+    inks.appendChild(custom);
+  }
+
+  $('#text-reset').addEventListener('click', () => {
+    session.texts = {};
+    session.caption = state.caption;
+    session.textColor = null;
+    session.font = 'auto';
+    buildTextEditor();
+    renderResult();
   });
   els.resultStickers.addEventListener('change', () => { session.stickers = els.resultStickers.checked; renderResult(); });
   $('#btn-shuffle').addEventListener('click', () => {

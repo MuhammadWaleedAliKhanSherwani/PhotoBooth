@@ -28,8 +28,18 @@ Open the `https://….vercel.app` link on the phone and use "Add to Home Screen"
   - **☀ Natural** (13): Vivid, Warm, Cool, Golden Hour, Soft Skin, Crisp, Fade, Moody, Mono…
   - **📷 Dazz** (16): D Classic, CPM 35, Inst C, GR F, NT 16, 135 NE (film border), HOGA (soft edges), KV 88 (camcorder), D Exp (expired film), Kino 800 (red halation), 1998 (flash + date stamp)…
   - **📼 Retro** (11): Disposable '98, VHS, Super 8, Polaroid '72, Game Boy, Riso…
-- **10 layouts:** Classic / Trio / Twin strips, Polaroid, Heart, Grid of 4, Big & Little, Film Roll, Six Pack, Postcard.
-- **9 frame colours**, auto-placed die-cut stickers (shuffle-able) and a caption.
+- **17 layouts:**
+  - **Fun (10):** Classic, Trio and Twin strips, Polaroid, Heart, Grid of 4, Big & Little, Film Roll, Six Pack, Postcard.
+  - **✦ Pro (7):** Gallery Mat (with keyline), Diptych, Triptych, Editorial, Lookbook, Clean Grid, Contact Sheet. These use flat mats, hairline rules, serif titles and letter-spaced small caps.
+- **11 frame colours plus 🌈 any custom colour.** Auto-placed die-cut stickers (shuffle-able), off by default on pro layouts.
+- **Edit every word on every print:**
+  - Every layout: caption and small line (the date by default).
+  - Postcard: greeting, message lines, address lines, postmark.
+  - Film Roll: top and bottom film-edge print.
+  - Contact Sheet: header.
+  - Clear a box to hide that text.
+  - **Text colour:** auto, 8 presets, or any custom colour. It applies to all text on the print.
+  - **Title font:** Script, Handwritten, Rounded, Retro, Pixel, Serif or Modern.
 - After shooting you can still change the filter, frame, stickers and caption.
 - **Customise stickers:** after shooting, add your own from a tray of 13 (Miso, Gina, Blackie, strawberry & raspberry matcha, hazelnut latte, hearts, bows…).
   - Drag them anywhere on the photo.
