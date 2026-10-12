@@ -175,7 +175,7 @@
   }
 
   function confetti() {
-    const glyphs = state.mode === 'retro' ? ['✦', '☮', '★', '✿', '♡'] : ['♡', '🐾', '🍵', '☕', '✿', '♥'];
+    const glyphs = state.mode === 'retro' ? ['✦', '☮', '★', '✿', '♡'] : ['♡', '🐾', '🍵', '🍓', '☕', '✿', '♥'];
     for (let i = 0; i < 36; i++) {
       const el = document.createElement('span');
       el.className = 'confetti';
@@ -194,11 +194,12 @@
       'Maheen, the camera is officially obsessed with you ♡',
       'The cats have reviewed this. 10/10, purrfect.',
       'Prettier than a perfectly poured latte ☕',
-      'Certified cutest member of the matcha club 🍵',
+      'Certified cutest member of the strawberry matcha club 🍓',
       'This one is going straight on the fridge',
       'Warning: dangerously cute levels detected',
       'Somebody call a museum, we have a masterpiece',
-      'Even the sleepy cat woke up for this one',
+      'Even Gina woke up for this one',
+      'Miso, Gina & Blackie all voted: 10/10',
     ],
     retro: [
       'Far out, Maheen ✌ totally groovy',
@@ -595,8 +596,13 @@
       seed: (Math.random() * 1e9) | 0,
       date: new Date(),
       blob: null,
+      base: null,
+      dirty: false,
+      custom: [],
+      sel: -1,
     };
     buildResultControls();
+    syncStickerEditor();
     els.loveNote.textContent = pick(NOTES[state.mode]);
     els.savedNote.classList.remove('show');
     openModal(els.resultModal);
@@ -638,16 +644,55 @@
     await wait(16); // let the spinner paint
     const out = compose(session.shots, s);
     if (token !== renderToken) return;
-    const rc = els.resultCanvas;
-    rc.width = out.width;
-    rc.height = out.height;
-    rc.getContext('2d').drawImage(out, 0, 0);
+    session.base = out;
+    paintResult();
     els.resultModal.classList.remove('rendering');
-    const blob = await new Promise((r) => out.toBlob(r, 'image/jpeg', 0.92));
-    if (token !== renderToken || !blob) return;
-    session.blob = blob;
+    await exportResult();
+  }
+
+  /** base print + the stickers she placed herself */
+  function finalCanvas() {
+    const c = makeCanvas(session.base.width, session.base.height);
+    const ctx = c.getContext('2d');
+    ctx.drawImage(session.base, 0, 0);
+    drawStickerList(ctx, session.custom);
+    return c;
+  }
+
+  /** on-screen version: same as the final print, plus a dashed ring around the selected sticker */
+  function paintResult() {
+    if (!session?.base) return;
+    const rc = els.resultCanvas, base = session.base;
+    if (rc.width !== base.width) rc.width = base.width;
+    if (rc.height !== base.height) rc.height = base.height;
+    const ctx = rc.getContext('2d');
+    ctx.drawImage(base, 0, 0);
+    drawStickerList(ctx, session.custom);
+    const st = session.custom[session.sel];
+    if (st) {
+      ctx.save();
+      ctx.setLineDash([st.size * 0.08, st.size * 0.06]);
+      ctx.lineWidth = Math.max(3, st.size * 0.025);
+      ctx.strokeStyle = 'rgba(227,127,156,.95)';
+      ctx.beginPath();
+      ctx.arc(st.x, st.y, st.size * 0.62, 0, TAU);
+      ctx.stroke();
+      ctx.restore();
+    }
+  }
+
+  let exportToken = 0;
+  async function exportResult() {
+    const sess = session;
+    if (!sess?.base) return;
+    const t = ++exportToken;
+    sess.dirty = true;
+    const blob = await new Promise((r) => finalCanvas().toBlob(r, 'image/jpeg', 0.92));
+    if (t !== exportToken || !blob) return;
+    sess.blob = blob;
+    sess.dirty = false;
     try {
-      await PhotoStore.save(session.id, blob);
+      await PhotoStore.save(sess.id, blob);
       els.savedNote.textContent = (await PhotoStore.ok())
         ? "✓ tucked away in this browser's cache"
         : '✓ kept for this visit (open the hosted link to keep photos for good)';
@@ -673,8 +718,164 @@
     session.stickers = els.resultStickers.checked = true;
     renderResult();
   });
-  $('#btn-share').addEventListener('click', () => session?.blob && shareBlob(session.blob, session.id));
-  $('#btn-download').addEventListener('click', () => session?.blob && downloadBlob(session.blob, session.id));
+  async function freshBlob() {
+    if (session && (session.dirty || !session.blob)) await exportResult();
+    return session?.blob;
+  }
+  $('#btn-share').addEventListener('click', async () => { const b = await freshBlob(); if (b) shareBlob(b, session.id); });
+  $('#btn-download').addEventListener('click', async () => { const b = await freshBlob(); if (b) downloadBlob(b, session.id); });
+
+  /* ---------------- customise stickers ---------------- */
+  const stEdit = $('#sticker-edit');
+  const stSize = $('#st-size');
+  const stRot = $('#st-rot');
+  const stClear = $('#st-clear');
+
+  (function buildPalette() {
+    const box = $('#sticker-palette');
+    STICKER_PALETTE.forEach(({ kind, label }) => {
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'st-btn';
+      b.title = label;
+      b.setAttribute('aria-label', `Add ${label} sticker`);
+      const c = makeCanvas(72, 72);
+      drawSticker(c.getContext('2d'), kind, 36, 38, 50, 0, mulberry32(7));
+      b.appendChild(c);
+      b.addEventListener('click', () => addSticker(kind));
+      box.appendChild(b);
+    });
+  })();
+
+  function addSticker(kind) {
+    if (!session?.base) return;
+    const { width: W, height: H } = session.base;
+    const unit = Math.min(W, H) * 0.2;
+    const n = session.custom.length;
+    session.custom.push({
+      kind,
+      x: W / 2 + ((n % 5) - 2) * unit * 0.35,
+      y: H * 0.45 + ((n % 3) - 1) * unit * 0.35,
+      size: unit,
+      unit,
+      rot: (Math.random() - 0.5) * 0.4,
+      seed: (Math.random() * 1e9) | 0,
+    });
+    session.sel = session.custom.length - 1;
+    beep(1200, 0.06, 'sine', 0.06);
+    stickersChanged();
+  }
+
+  function stickersChanged() {
+    paintResult();
+    syncStickerEditor();
+    exportResult();
+  }
+
+  function syncStickerEditor() {
+    const st = session?.custom[session.sel];
+    stEdit.hidden = !st;
+    stClear.hidden = !session?.custom.length;
+    els.resultCanvas.classList.toggle('has-stickers', !!session?.custom.length);
+    if (st) {
+      stSize.value = st.size / st.unit;
+      stRot.value = Math.round((st.rot * 180) / Math.PI);
+    }
+  }
+
+  const selected = () => session?.custom[session.sel];
+  stSize.addEventListener('input', () => { const st = selected(); if (st) { st.size = st.unit * Number(stSize.value); paintResult(); } });
+  stRot.addEventListener('input', () => { const st = selected(); if (st) { st.rot = (Number(stRot.value) * Math.PI) / 180; paintResult(); } });
+  [stSize, stRot].forEach((el) => el.addEventListener('change', () => exportResult()));
+  $('#st-dup').addEventListener('click', () => {
+    const st = selected(); if (!st) return;
+    session.custom.push({ ...st, x: st.x + st.size * 0.4, y: st.y + st.size * 0.3, seed: (Math.random() * 1e9) | 0 });
+    session.sel = session.custom.length - 1;
+    stickersChanged();
+  });
+  $('#st-front').addEventListener('click', () => {
+    const st = selected(); if (!st) return;
+    session.custom.splice(session.sel, 1);
+    session.custom.push(st);
+    session.sel = session.custom.length - 1;
+    stickersChanged();
+  });
+  function deleteSelected() {
+    if (!selected()) return;
+    session.custom.splice(session.sel, 1);
+    session.sel = -1;
+    stickersChanged();
+  }
+  $('#st-delete').addEventListener('click', deleteSelected);
+  stClear.addEventListener('click', () => {
+    session.custom = [];
+    session.sel = -1;
+    stickersChanged();
+  });
+
+  // drag stickers around on the print
+  (function stickerDragging() {
+    const rc = els.resultCanvas;
+    let drag = null;
+    const toCanvas = (e) => {
+      const r = rc.getBoundingClientRect();
+      return [((e.clientX - r.left) * rc.width) / r.width, ((e.clientY - r.top) * rc.height) / r.height];
+    };
+    const hit = (x, y) => {
+      const list = session?.custom || [];
+      for (let i = list.length - 1; i >= 0; i--) {
+        if (Math.hypot(x - list[i].x, y - list[i].y) < list[i].size * 0.55) return i;
+      }
+      return -1;
+    };
+    rc.addEventListener('pointerdown', (e) => {
+      if (!session?.custom.length) return;
+      const [x, y] = toCanvas(e);
+      const i = hit(x, y);
+      session.sel = i;
+      if (i >= 0) {
+        const st = session.custom[i];
+        drag = { id: e.pointerId, dx: x - st.x, dy: y - st.y, moved: false };
+        rc.setPointerCapture(e.pointerId);
+        e.preventDefault();
+      }
+      paintResult();
+      syncStickerEditor();
+    });
+    rc.addEventListener('pointermove', (e) => {
+      if (!drag || e.pointerId !== drag.id) {
+        if (e.pointerType === 'mouse') rc.style.cursor = hit(...toCanvas(e)) >= 0 ? 'grab' : '';
+        return;
+      }
+      const [x, y] = toCanvas(e);
+      const st = session.custom[session.sel];
+      st.x = Math.min(Math.max(x - drag.dx, 0), rc.width);
+      st.y = Math.min(Math.max(y - drag.dy, 0), rc.height);
+      drag.moved = true;
+      rc.style.cursor = 'grabbing';
+      paintResult();
+    });
+    const end = () => {
+      if (!drag) return;
+      const moved = drag.moved;
+      drag = null;
+      rc.style.cursor = '';
+      if (moved) exportResult();
+    };
+    rc.addEventListener('pointerup', end);
+    rc.addEventListener('pointercancel', end);
+    let wheelTimer;
+    rc.addEventListener('wheel', (e) => {
+      const st = selected();
+      if (!st) return;
+      e.preventDefault();
+      st.size = Math.min(st.unit * 3, Math.max(st.unit * 0.3, st.size * (e.deltaY < 0 ? 1.08 : 0.92)));
+      paintResult();
+      syncStickerEditor();
+      clearTimeout(wheelTimer);
+      wheelTimer = setTimeout(exportResult, 300);
+    }, { passive: false });
+  })();
   $('#btn-retake').addEventListener('click', () => {
     closeModal(els.resultModal);
     if (state.stream) startSession();
@@ -799,11 +1000,17 @@
     el.classList.add('bounce');
   }
 
+  const CAT_LINES = {
+    miso: ['Miso says mrrp ♡', 'Miso wants a strawberry matcha too 🍓🍵', 'Miso approves this photoshoot', 'Miso is doing the slow blink at you'],
+    gina: ['Gina woke up… and went right back to sleep 😴', 'Gina, the fluffiest princess 👑', 'Gina demands chin scratches', 'Gina is too fluffy to function'],
+    blackie: ['Blackie is watching you 👀', 'Blackie says: pose harder', 'Blackie is plotting to steal the hazelnut latte ☕', 'Blackie thinks you look cute today'],
+  };
   $$('.cat').forEach((cat) => {
     cat.addEventListener('click', (e) => {
       bounce(cat);
       mew();
       heartsBurst(e.clientX, e.clientY);
+      if (CAT_LINES[cat.dataset.cat]) toast(pick(CAT_LINES[cat.dataset.cat]));
       if (cat.classList.contains('cat-loaf')) {
         cat.classList.add('awake');
         clearTimeout(cat._sleep);
@@ -816,7 +1023,11 @@
     beep(660, 0.08, 'sine', 0.08);
     setTimeout(() => beep(990, 0.12, 'sine', 0.08), 80);
     heartsBurst(e.clientX, e.clientY, 6);
-    toast(cup.classList.contains('iced-matcha') ? 'sip sip 🍵 extra oat milk, as always' : 'one hazelnut latte, extra love ☕');
+    toast({
+      strawberry: 'sip sip 🍓🍵 strawberry matcha, extra pink',
+      raspberry: 'raspberry matcha 💗🍵 tangy & cute, just like you',
+      hazelnut: 'one hazelnut latte, extra love ☕',
+    }[cup.dataset.drink]);
   }));
 
   // the black cat on top of the camera watches your cursor 👀
@@ -907,6 +1118,11 @@
 
   window.addEventListener('keydown', (e) => {
     const openModalEl = $$('.modal').find((m) => !m.hidden);
+    if ((e.key === 'Delete' || e.key === 'Backspace') && !els.resultModal.hidden && !e.target.matches('input, textarea') && selected()) {
+      e.preventDefault();
+      deleteSelected();
+      return;
+    }
     if (e.key === 'Escape') {
       if (state.busy) state.cancel = true;
       else if (openModalEl) closeModal($$('.modal').filter((m) => !m.hidden).pop());

@@ -340,7 +340,7 @@ function drawStickersOn(ctx, L, s) {
   if (cap.kind === 'strip') {
     (cap.cols || [[0, L.w]]).forEach(([x, w]) => {
       const sz = Math.min(cap.h * 0.62, 110);
-      drawSticker(ctx, s.retro ? 'cassette' : 'matcha', x + w * 0.12 + sz * 0.2, cap.y + cap.h * 0.5, sz, -0.18, rng);
+      drawSticker(ctx, s.retro ? 'cassette' : 'strawmatcha', x + w * 0.12 + sz * 0.2, cap.y + cap.h * 0.5, sz, -0.18, rng);
       drawSticker(ctx, s.retro ? 'smiley' : 'hazel', x + w * 0.88 - sz * 0.2, cap.y + cap.h * 0.5, sz, 0.15, rng);
     });
   } else if (cap.kind === 'polaroid') {

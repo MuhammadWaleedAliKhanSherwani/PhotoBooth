@@ -101,8 +101,34 @@ function stPaw(ctx, s, rng) {
   [[-0.29, -0.1], [-0.11, -0.29], [0.11, -0.29], [0.29, -0.1]].forEach(([x, y]) => oval(ctx, x * s, y * s, s * 0.05, s * 0.06, '#f7a1b5'));
 }
 
-function catHeadPath(ctx, s) {
+/* ---------- the three cats: Miso, Gina & Blackie ---------- */
+const CATS = {
+  miso: { fur: '#f7cfa3', shade: '#e9a86e', eye: STICKER_INK },                // slightly orange tabby
+  blackie: { fur: '#2f2a28', shade: '#4a4340', eye: '#f6d66b' },               // black, golden eyes
+  gina: { fur: '#fffaf5', shade: '#e6dccf', eye: '#7fb3e6', persian: true },   // white persian, blue eyes
+};
+
+function catHeadPath(ctx, s, persian) {
   ctx.beginPath();
+  if (persian) {
+    // round fluffy face + little ears
+    ctx.ellipse(0, s * 0.07, s * 0.42, s * 0.33, 0, 0, TAU);
+    for (let i = 0; i < 14; i++) {
+      const a = (i / 14) * TAU;
+      const x = Math.cos(a) * s * 0.41, y = s * 0.07 + Math.sin(a) * s * 0.32;
+      ctx.moveTo(x + s * 0.09, y);
+      ctx.arc(x, y, s * 0.09, 0, TAU);
+    }
+    ctx.moveTo(-s * 0.36, -s * 0.1);
+    ctx.lineTo(-s * 0.3, -s * 0.38);
+    ctx.lineTo(-s * 0.12, -s * 0.26);
+    ctx.closePath();
+    ctx.moveTo(s * 0.12, -s * 0.26);
+    ctx.lineTo(s * 0.3, -s * 0.38);
+    ctx.lineTo(s * 0.36, -s * 0.1);
+    ctx.closePath();
+    return;
+  }
   ctx.ellipse(0, s * 0.06, s * 0.4, s * 0.33, 0, 0, TAU);
   ctx.moveTo(-s * 0.38, -s * 0.02);
   ctx.lineTo(-s * 0.3, -s * 0.42);
@@ -114,75 +140,111 @@ function catHeadPath(ctx, s) {
   ctx.closePath();
 }
 
-function stCat(ctx, s, rng) {
-  const furs = [['#f2b880', '#d98f52'], ['#3a3330', '#5a504c'], ['#b8bec6', '#9aa0a8'], ['#fff4e6', '#e9d6bf']];
-  const [fur, stripe] = furs[(rng() * furs.length) | 0];
-  const dark = fur === '#3a3330';
-  stickerBase(ctx, s, () => catHeadPath(ctx, s));
-  catHeadPath(ctx, s);
-  ctx.fillStyle = fur;
+function drawCat(ctx, s, rng, name) {
+  const c = CATS[name];
+  const dark = name === 'blackie';
+  stickerBase(ctx, s, () => catHeadPath(ctx, s, c.persian));
+  // soft outline first so white Gina doesn't vanish into the sticker border
+  catHeadPath(ctx, s, c.persian);
+  ctx.lineWidth = s * 0.03;
+  ctx.lineJoin = 'round';
+  ctx.strokeStyle = c.shade;
+  ctx.stroke();
+  ctx.fillStyle = c.fur;
   ctx.fill();
+
   // inner ears
   ctx.fillStyle = '#f7a1b5';
   ctx.beginPath();
-  ctx.moveTo(-s * 0.32, -s * 0.08); ctx.lineTo(-s * 0.28, -s * 0.32); ctx.lineTo(-s * 0.14, -s * 0.2); ctx.closePath();
-  ctx.moveTo(s * 0.14, -s * 0.2); ctx.lineTo(s * 0.28, -s * 0.32); ctx.lineTo(s * 0.32, -s * 0.08); ctx.closePath();
+  if (c.persian) {
+    ctx.moveTo(-s * 0.31, -s * 0.13); ctx.lineTo(-s * 0.28, -s * 0.31); ctx.lineTo(-s * 0.17, -s * 0.24); ctx.closePath();
+    ctx.moveTo(s * 0.17, -s * 0.24); ctx.lineTo(s * 0.28, -s * 0.31); ctx.lineTo(s * 0.31, -s * 0.13); ctx.closePath();
+  } else {
+    ctx.moveTo(-s * 0.32, -s * 0.08); ctx.lineTo(-s * 0.28, -s * 0.32); ctx.lineTo(-s * 0.14, -s * 0.2); ctx.closePath();
+    ctx.moveTo(s * 0.14, -s * 0.2); ctx.lineTo(s * 0.28, -s * 0.32); ctx.lineTo(s * 0.32, -s * 0.08); ctx.closePath();
+  }
   ctx.fill();
-  // forehead stripes
-  ctx.strokeStyle = stripe;
-  ctx.lineWidth = s * 0.035;
+
   ctx.lineCap = 'round';
-  ctx.beginPath();
-  ctx.moveTo(-s * 0.06, -s * 0.24); ctx.lineTo(-s * 0.04, -s * 0.15);
-  ctx.moveTo(0, -s * 0.26); ctx.lineTo(0, -s * 0.16);
-  ctx.moveTo(s * 0.06, -s * 0.24); ctx.lineTo(s * 0.04, -s * 0.15);
-  ctx.stroke();
+  if (name === 'miso') {
+    // tabby forehead stripes
+    ctx.strokeStyle = c.shade;
+    ctx.lineWidth = s * 0.035;
+    ctx.beginPath();
+    ctx.moveTo(-s * 0.06, -s * 0.24); ctx.lineTo(-s * 0.04, -s * 0.15);
+    ctx.moveTo(0, -s * 0.26); ctx.lineTo(0, -s * 0.16);
+    ctx.moveTo(s * 0.06, -s * 0.24); ctx.lineTo(s * 0.04, -s * 0.15);
+    ctx.stroke();
+  }
+  if (c.persian) {
+    // a little pink bow for Gina
+    ctx.save();
+    ctx.translate(s * 0.26, -s * 0.24);
+    ctx.rotate(0.3);
+    ctx.fillStyle = '#f48fb1';
+    ctx.beginPath();
+    ctx.moveTo(0, 0); ctx.lineTo(-s * 0.1, -s * 0.06); ctx.lineTo(-s * 0.1, s * 0.06); ctx.closePath();
+    ctx.moveTo(0, 0); ctx.lineTo(s * 0.1, -s * 0.06); ctx.lineTo(s * 0.1, s * 0.06); ctx.closePath();
+    ctx.fill();
+    dot(ctx, 0, 0, s * 0.03, '#e37f9c');
+    ctx.restore();
+  }
 
   const ink = dark ? '#fff4e6' : STICKER_INK;
-  const happy = rng() < 0.5;
+  const eyeY = c.persian ? s * 0.06 : s * 0.03;
   ctx.strokeStyle = ink;
   ctx.lineWidth = s * 0.03;
-  if (happy) {
+  if (rng() < 0.4) {
     ctx.beginPath();
-    ctx.arc(-s * 0.15, s * 0.05, s * 0.05, Math.PI * 1.1, Math.PI * 1.9);
-    ctx.moveTo(s * 0.2, s * 0.03);
-    ctx.arc(s * 0.15, s * 0.05, s * 0.05, Math.PI * 1.1, Math.PI * 1.9);
+    ctx.arc(-s * 0.15, eyeY + s * 0.02, s * 0.05, Math.PI * 1.1, Math.PI * 1.9);
+    ctx.moveTo(s * 0.2, eyeY);
+    ctx.arc(s * 0.15, eyeY + s * 0.02, s * 0.05, Math.PI * 1.1, Math.PI * 1.9);
     ctx.stroke();
   } else {
-    const eye = dark ? '#f6d66b' : STICKER_INK;
-    oval(ctx, -s * 0.15, s * 0.03, s * 0.045, s * 0.055, eye);
-    oval(ctx, s * 0.15, s * 0.03, s * 0.045, s * 0.055, eye);
-    if (dark) {
-      oval(ctx, -s * 0.15, s * 0.03, s * 0.015, s * 0.045, '#1d1613');
-      oval(ctx, s * 0.15, s * 0.03, s * 0.015, s * 0.045, '#1d1613');
+    const ew = c.persian ? 0.055 : 0.045;
+    oval(ctx, -s * 0.15, eyeY, s * ew, s * 0.055, c.eye);
+    oval(ctx, s * 0.15, eyeY, s * ew, s * 0.055, c.eye);
+    if (c.eye !== STICKER_INK) {
+      oval(ctx, -s * 0.15, eyeY, s * (dark ? 0.015 : 0.028), s * 0.045, '#1d1613');
+      oval(ctx, s * 0.15, eyeY, s * (dark ? 0.015 : 0.028), s * 0.045, '#1d1613');
     }
-    dot(ctx, -s * 0.135, s * 0.01, s * 0.016, '#fff');
-    dot(ctx, s * 0.165, s * 0.01, s * 0.016, '#fff');
+    dot(ctx, -s * 0.135, eyeY - s * 0.02, s * 0.016, '#fff');
+    dot(ctx, s * 0.165, eyeY - s * 0.02, s * 0.016, '#fff');
   }
-  // nose + ω mouth
+  // nose + ω mouth (persians have a squishier, higher-set face)
+  const ny = c.persian ? s * 0.12 : s * 0.1;
   ctx.fillStyle = '#e37f9c';
   ctx.beginPath();
-  ctx.moveTo(-s * 0.03, s * 0.1); ctx.lineTo(s * 0.03, s * 0.1); ctx.lineTo(0, s * 0.135); ctx.closePath();
+  ctx.moveTo(-s * 0.03, ny); ctx.lineTo(s * 0.03, ny); ctx.lineTo(0, ny + s * 0.035); ctx.closePath();
   ctx.fill();
   ctx.beginPath();
-  ctx.arc(-s * 0.035, s * 0.14, s * 0.035, 0.1 * Math.PI, 0.9 * Math.PI);
-  ctx.moveTo(s * 0.07, s * 0.14);
-  ctx.arc(s * 0.035, s * 0.14, s * 0.035, 0.1 * Math.PI, 0.9 * Math.PI);
+  ctx.arc(-s * 0.035, ny + s * 0.04, s * 0.035, 0.1 * Math.PI, 0.9 * Math.PI);
+  ctx.moveTo(s * 0.07, ny + s * 0.04);
+  ctx.arc(s * 0.035, ny + s * 0.04, s * 0.035, 0.1 * Math.PI, 0.9 * Math.PI);
   ctx.stroke();
-  oval(ctx, -s * 0.25, s * 0.13, s * 0.06, s * 0.035, 'rgba(247,161,181,.85)');
-  oval(ctx, s * 0.25, s * 0.13, s * 0.06, s * 0.035, 'rgba(247,161,181,.85)');
+  oval(ctx, -s * 0.25, ny + s * 0.03, s * 0.06, s * 0.035, 'rgba(247,161,181,.85)');
+  oval(ctx, s * 0.25, ny + s * 0.03, s * 0.06, s * 0.035, 'rgba(247,161,181,.85)');
   // whiskers
   ctx.globalAlpha = 0.55;
+  ctx.strokeStyle = dark ? '#fff4e6' : c.persian ? '#b9aa9a' : STICKER_INK;
   ctx.lineWidth = s * 0.018;
   ctx.beginPath();
-  ctx.moveTo(-s * 0.3, s * 0.08); ctx.lineTo(-s * 0.48, s * 0.04);
-  ctx.moveTo(-s * 0.3, s * 0.12); ctx.lineTo(-s * 0.48, s * 0.14);
-  ctx.moveTo(s * 0.3, s * 0.08); ctx.lineTo(s * 0.48, s * 0.04);
-  ctx.moveTo(s * 0.3, s * 0.12); ctx.lineTo(s * 0.48, s * 0.14);
+  ctx.moveTo(-s * 0.3, ny - s * 0.02); ctx.lineTo(-s * 0.48, ny - s * 0.06);
+  ctx.moveTo(-s * 0.3, ny + s * 0.02); ctx.lineTo(-s * 0.48, ny + s * 0.04);
+  ctx.moveTo(s * 0.3, ny - s * 0.02); ctx.lineTo(s * 0.48, ny - s * 0.06);
+  ctx.moveTo(s * 0.3, ny + s * 0.02); ctx.lineTo(s * 0.48, ny + s * 0.04);
   ctx.stroke();
   ctx.globalAlpha = 1;
 }
 
+const stMiso = (ctx, s, rng) => drawCat(ctx, s, rng, 'miso');
+const stGina = (ctx, s, rng) => drawCat(ctx, s, rng, 'gina');
+const stBlackie = (ctx, s, rng) => drawCat(ctx, s, rng, 'blackie');
+function stCat(ctx, s, rng) {
+  drawCat(ctx, s, rng, ['miso', 'gina', 'blackie'][(rng() * 3) | 0]);
+}
+
+/* ---------- iced strawberry / raspberry matcha ---------- */
 function icedCupPath(ctx, s) {
   ctx.beginPath();
   ctx.moveTo(-s * 0.27, -s * 0.22);
@@ -192,33 +254,71 @@ function icedCupPath(ctx, s) {
   ctx.closePath();
 }
 
-function stMatcha(ctx, s) {
-  const straw = () => {
-    ctx.save();
-    ctx.rotate(0.22);
-    ctx.beginPath();
-    ctx.rect(s * 0.02, -s * 0.5, s * 0.08, s * 0.4);
-    ctx.restore();
-  };
-  stickerBase(ctx, s, () => { icedCupPath(ctx, s); ctx.save(); ctx.rotate(0.22); ctx.rect(s * 0.02, -s * 0.5, s * 0.08, s * 0.4); ctx.restore(); });
-  // straw
-  straw();
-  ctx.fillStyle = '#f6b8c8';
+const BERRY = {
+  strawberry: { milk: '#f9c6d3', mid: '#f4a7bb', straw: '#9cbf7a' },
+  raspberry: { milk: '#e86b98', mid: '#d9467a', straw: '#f6b8c8' },
+};
+
+function drawStrawberry(ctx, x, y, r) {
+  ctx.save();
+  ctx.translate(x, y);
+  ctx.beginPath();
+  ctx.moveTo(0, r * 1.1);
+  ctx.bezierCurveTo(-r * 1.2, r * 0.2, -r * 0.9, -r * 0.8, 0, -r * 0.6);
+  ctx.bezierCurveTo(r * 0.9, -r * 0.8, r * 1.2, r * 0.2, 0, r * 1.1);
+  ctx.fillStyle = '#e8425a';
   ctx.fill();
-  // liquid
+  [[-0.35, -0.1], [0.3, -0.15], [0, 0.2], [-0.25, 0.45], [0.25, 0.4], [0, -0.3]].forEach(([a, b]) => dot(ctx, a * r, b * r, r * 0.07, '#ffe08a'));
+  ctx.fillStyle = '#5f8a43';
+  ctx.beginPath();
+  ctx.ellipse(-r * 0.3, -r * 0.7, r * 0.35, r * 0.13, -0.4, 0, TAU);
+  ctx.ellipse(r * 0.3, -r * 0.7, r * 0.35, r * 0.13, 0.4, 0, TAU);
+  ctx.ellipse(0, -r * 0.8, r * 0.13, r * 0.3, 0, 0, TAU);
+  ctx.fill();
+  ctx.restore();
+}
+
+function drawRaspberry(ctx, x, y, r) {
+  ctx.save();
+  ctx.translate(x, y);
+  [[0, -0.5], [-0.35, -0.2], [0.35, -0.2], [0, 0.05], [-0.25, 0.35], [0.25, 0.35], [0, 0.6]].forEach(([a, b]) => {
+    dot(ctx, a * r, b * r, r * 0.3, '#c2185b');
+    dot(ctx, a * r - r * 0.08, b * r - r * 0.08, r * 0.09, 'rgba(255,255,255,.45)');
+  });
+  ctx.fillStyle = '#5f8a43';
+  ctx.beginPath();
+  ctx.ellipse(-r * 0.2, -r * 0.85, r * 0.25, r * 0.1, -0.5, 0, TAU);
+  ctx.ellipse(r * 0.2, -r * 0.85, r * 0.25, r * 0.1, 0.5, 0, TAU);
+  ctx.fill();
+  ctx.restore();
+}
+
+function drawBerryMatcha(ctx, s, kind) {
+  const B = BERRY[kind];
+  const strawPath = () => { ctx.save(); ctx.rotate(0.22); ctx.rect(s * 0.02, -s * 0.5, s * 0.08, s * 0.4); ctx.restore(); };
+  stickerBase(ctx, s, () => {
+    icedCupPath(ctx, s);
+    strawPath();
+    ctx.moveTo(-s * 0.2 + s * 0.17, -s * 0.28);
+    ctx.arc(-s * 0.2, -s * 0.28, s * 0.17, 0, TAU);
+  });
+  ctx.beginPath();
+  strawPath();
+  ctx.fillStyle = B.straw;
+  ctx.fill();
+  // matcha on top, berry milk at the bottom
   icedCupPath(ctx, s);
   const g = ctx.createLinearGradient(0, -s * 0.22, 0, s * 0.42);
   g.addColorStop(0, '#a9cb87');
-  g.addColorStop(0.5, '#9cbf7a');
-  g.addColorStop(0.52, '#c9dcae');
-  g.addColorStop(0.58, '#f6efe0');
-  g.addColorStop(1, '#f6efe0');
+  g.addColorStop(0.42, '#9cbf7a');
+  g.addColorStop(0.5, '#e8efd9');
+  g.addColorStop(0.56, B.mid);
+  g.addColorStop(1, B.milk);
   ctx.fillStyle = g;
   ctx.fill();
-  ctx.strokeStyle = '#bcd0a6';
+  ctx.strokeStyle = '#d7c8c0';
   ctx.lineWidth = s * 0.025;
   ctx.stroke();
-  // ice
   ctx.fillStyle = 'rgba(255,255,255,.55)';
   [[-0.12, -0.1, -0.2], [0.08, -0.05, 0.25]].forEach(([x, y, r]) => {
     ctx.save();
@@ -227,11 +327,15 @@ function stMatcha(ctx, s) {
     ctx.fillRect(-s * 0.07, -s * 0.07, s * 0.14, s * 0.14);
     ctx.restore();
   });
-  // lid rim
-  ctx.fillStyle = '#e6f0d6';
+  ctx.fillStyle = '#fbeff2';
   ctx.fillRect(-s * 0.3, -s * 0.26, s * 0.6, s * 0.06);
+  if (kind === 'strawberry') drawStrawberry(ctx, -s * 0.2, -s * 0.28, s * 0.13);
+  else drawRaspberry(ctx, -s * 0.2, -s * 0.28, s * 0.13);
   kawaiiFace(ctx, 0, s * 0.22, s, false);
 }
+
+const stStrawMatcha = (ctx, s) => drawBerryMatcha(ctx, s, 'strawberry');
+const stRaspMatcha = (ctx, s) => drawBerryMatcha(ctx, s, 'raspberry');
 
 function stHazel(ctx, s) {
   const mug = () => {
@@ -421,11 +525,30 @@ function roundRectPath(ctx, x, y, w, h, r) {
 }
 
 const STICKERS = {
-  heart: stHeart, paw: stPaw, cat: stCat, matcha: stMatcha, hazel: stHazel,
-  sparkle: stSparkle, bow: stBow, smiley: stSmiley, daisy: stDaisy, cassette: stCassette,
+  miso: stMiso, gina: stGina, blackie: stBlackie, cat: stCat,
+  strawmatcha: stStrawMatcha, raspmatcha: stRaspMatcha, hazel: stHazel,
+  heart: stHeart, paw: stPaw, sparkle: stSparkle, bow: stBow,
+  smiley: stSmiley, daisy: stDaisy, cassette: stCassette,
 };
-const CUTE_SET = ['heart', 'paw', 'cat', 'matcha', 'hazel', 'sparkle', 'bow', 'cat', 'heart'];
-const RETRO_SET = ['smiley', 'daisy', 'cassette', 'cat', 'sparkle', 'paw', 'daisy', 'hazel', 'matcha'];
+const CUTE_SET = ['heart', 'paw', 'miso', 'gina', 'blackie', 'strawmatcha', 'raspmatcha', 'hazel', 'sparkle', 'bow', 'heart'];
+const RETRO_SET = ['smiley', 'daisy', 'cassette', 'miso', 'gina', 'blackie', 'sparkle', 'paw', 'hazel', 'raspmatcha'];
+
+/** what shows up in the "add stickers" tray */
+const STICKER_PALETTE = [
+  { kind: 'miso', label: 'Miso' },
+  { kind: 'gina', label: 'Gina' },
+  { kind: 'blackie', label: 'Blackie' },
+  { kind: 'strawmatcha', label: 'Strawberry matcha' },
+  { kind: 'raspmatcha', label: 'Raspberry matcha' },
+  { kind: 'hazel', label: 'Hazelnut latte' },
+  { kind: 'heart', label: 'Heart' },
+  { kind: 'paw', label: 'Paw' },
+  { kind: 'bow', label: 'Bow' },
+  { kind: 'sparkle', label: 'Sparkle' },
+  { kind: 'daisy', label: 'Daisy' },
+  { kind: 'smiley', label: 'Smiley' },
+  { kind: 'cassette', label: 'Mixtape' },
+];
 
 function drawSticker(ctx, kind, x, y, size, rot, rng) {
   ctx.save();
@@ -433,4 +556,9 @@ function drawSticker(ctx, kind, x, y, size, rot, rng) {
   ctx.rotate(rot);
   (STICKERS[kind] || stHeart)(ctx, size, rng || Math.random);
   ctx.restore();
+}
+
+/** user-placed stickers: [{ kind, x, y, size, rot, seed }] */
+function drawStickerList(ctx, list) {
+  list.forEach((st) => drawSticker(ctx, st.kind, st.x, st.y, st.size, st.rot, mulberry32(st.seed)));
 }

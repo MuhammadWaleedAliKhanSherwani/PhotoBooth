@@ -736,3 +736,70 @@ kbd { background: var(--card); border: 1px solid var(--line); border-bottom-widt
   *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition: none !important; }
   .floaties { display: none; }
 }
+
+/* ---------- cat name tags ---------- */
+.cat-spot { display: flex; flex-direction: column; align-items: center; gap: 2px; }
+.cat-name {
+  font-family: 'Caveat', cursive;
+  font-weight: 600;
+  font-size: 1.3rem;
+  line-height: 1;
+  color: #fff;
+  background: var(--hazel);
+  padding: 3px 12px 4px;
+  border-radius: 999px;
+  box-shadow: 0 3px 8px rgba(107, 68, 40, .18);
+  transform: rotate(-4deg);
+}
+.side-right .cat-name { background: #c9a9b8; transform: rotate(3deg); }
+.peek-name {
+  position: absolute;
+  top: 26px;
+  right: 182px;
+  z-index: 3;
+  background: #3a3330;
+  transform: rotate(-6deg);
+}
+.retro .cat-name { font-family: 'VT323', monospace; font-size: 1.2rem; border-radius: 6px; }
+.drinks-row { display: flex; gap: 14px; align-items: flex-end; }
+.drinks-row .latte { width: 92px; }
+@media (max-width: 1240px) {
+  .drinks-row .latte { width: 70px; }
+}
+@media (max-width: 520px) {
+  .peek-name { right: 130px; top: 30px; font-size: 1.1rem; }
+}
+
+/* ---------- sticker customiser ---------- */
+.result-block h4 small { font-weight: 400; opacity: .8; }
+.sticker-palette {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(52px, 1fr));
+  gap: 6px;
+}
+.st-btn {
+  border: 2px solid var(--line);
+  background: var(--bg);
+  border-radius: 14px;
+  padding: 2px;
+  display: grid;
+  place-items: center;
+  transition: transform .15s, border-color .15s;
+}
+.st-btn canvas { width: 100%; height: auto; max-width: 56px; }
+.st-btn:hover { transform: translateY(-2px) rotate(-6deg); border-color: var(--accent-2); }
+.st-btn:active { transform: scale(.92); }
+.retro .st-btn { border-radius: 6px; }
+.sticker-edit {
+  margin-top: 10px;
+  padding: 10px 12px;
+  border-radius: 14px;
+  background: var(--bg);
+  display: grid;
+  gap: 8px;
+}
+.slider { display: grid; grid-template-columns: 42px 1fr; align-items: center; gap: 8px; font-size: .85rem; color: var(--muted); }
+.slider input { width: 100%; accent-color: var(--accent-2); }
+.sticker-edit-actions { display: flex; flex-wrap: wrap; gap: 6px; }
+#st-clear { margin-top: 8px; }
+#result-canvas.has-stickers { touch-action: none; cursor: default; }

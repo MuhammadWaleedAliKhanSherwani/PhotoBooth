@@ -31,6 +31,12 @@ Open the `https://….vercel.app` link on the phone and use "Add to Home Screen"
 - **10 layouts:** Classic / Trio / Twin strips, Polaroid, Heart, Grid of 4, Big & Little, Film Roll, Six Pack, Postcard.
 - **9 frame colours**, auto-placed die-cut stickers (shuffle-able) and a caption.
 - After shooting you can still change the filter, frame, stickers and caption.
+- **Customise stickers:** after shooting, add your own from a tray of 13 (Miso, Gina, Blackie, strawberry & raspberry matcha, hazelnut latte, hearts, bows…).
+  - Drag them anywhere on the photo.
+  - Resize and rotate with the sliders, or resize with the mouse wheel.
+  - Copy, bring to front, or remove (the <kbd>Delete</kbd> key works too).
+  - Placed stickers are included in the saved and shared photo.
+- **The cats:** **Miso** (light orange tabby), **Gina** (sleepy white Persian, with blue eyes when she wakes up), and **Blackie** (the black cat peeking over the camera, whose eyes follow your cursor). Tap them to see what they say.
 - **Saved in Cache Storage** (`maheen-photos-v1`) automatically; browse, share, or delete them in the album.
 - **WhatsApp:** on phones, the native share sheet opens with the photo attached. On desktop, the photo downloads and WhatsApp opens so you can attach it.
 - No camera? Pick photos from the gallery instead.
