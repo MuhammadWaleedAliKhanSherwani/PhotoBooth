@@ -372,7 +372,9 @@
         persist();
         $$('.layout-card', els.layoutList).forEach((x) => x.classList.toggle('active', x.dataset.id === L.id));
         refreshPanelNames();
+        shapeKey = '';
         if (!state.stream) drawIdlePreview();
+        else previewSize();
       });
       els.layoutList.appendChild(b);
     });
@@ -474,7 +476,31 @@
 
   function previewSize() {
     const slot = slotForShot(curLayout(), state.shotIndex);
+    syncShape(slot);
     return [PREVIEW_W, Math.round((PREVIEW_W * slot.h) / slot.w)];
+  }
+
+  /** the camera window takes the exact shape of the photo slot it's filling */
+  const cameraWrap = $('.camera-wrap');
+  const ratioBadge = $('#ratio-badge');
+  let shapeKey = '';
+  function ratioName(w, h) {
+    const r = w / h;
+    const named = [[1, '1:1'], [4 / 3, '4:3'], [3 / 4, '3:4'], [16 / 9, '16:9'], [4 / 5, '4:5'], [3 / 2, '3:2'], [2 / 3, '2:3']];
+    const hit = named.find(([v]) => Math.abs(v - r) < 0.02);
+    if (hit) return hit[1];
+    return r >= 1 ? `${r.toFixed(2)}:1` : `1:${(1 / r).toFixed(2)}`;
+  }
+  function syncShape(slot) {
+    const key = `${slot.w}x${slot.h}`;
+    if (key === shapeKey) return;
+    shapeKey = key;
+    cameraWrap.style.setProperty('--ar', (slot.w / slot.h).toFixed(4));
+    ratioBadge.textContent = `${curLayout().name} · ${ratioName(slot.w, slot.h)}`;
+    // show the shape briefly, then get out of the way of date stamps & HUDs
+    ratioBadge.classList.add('show');
+    clearTimeout(syncShape.t);
+    syncShape.t = setTimeout(() => ratioBadge.classList.remove('show'), 2600);
   }
 
   function drawIdlePreview() {

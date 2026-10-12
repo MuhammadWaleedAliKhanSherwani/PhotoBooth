@@ -22,6 +22,7 @@ Open the `https://….vercel.app` link on the phone and use "Add to Home Screen"
 
 ## Features
 
+- **Camera shaped like the print:** the live camera window takes the exact shape of the photo slot it's filling (1:1 Polaroid, 4:5 Gallery Mat, 16:9 hero shot…). It reshapes between shots on mixed layouts and stays sticky on desktop while you scroll the options.
 - **Cute mode / Retro mode.** Retro restyles the whole site (wooden TV, film-leader countdown, cats in sunglasses).
 - **53 filters in 4 tabs:**
   - **♡ Cute** (13): Matcha, Hazelnut, Strawberry Milk, Dreamy, duotones…
