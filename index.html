@@ -41,15 +41,22 @@
           <g class="head">
             <path d="M50 80 L58 20 L94 52 Z" fill="#f7cfa3"/>
             <path d="M60 68 L64 36 L84 54 Z" fill="#f7a1b5"/>
-            <path d="M150 80 L142 20 L106 52 Z" fill="#f7cfa3"/>
-            <path d="M140 68 L136 36 L116 54 Z" fill="#f7a1b5"/>
+            <g class="ear ear-r">
+              <path d="M150 80 L142 20 L106 52 Z" fill="#f7cfa3"/>
+              <path d="M140 68 L136 36 L116 54 Z" fill="#f7a1b5"/>
+            </g>
             <ellipse cx="100" cy="90" rx="58" ry="48" fill="#f7cfa3"/>
             <path d="M92 47 l4 14 M100 44 l0 16 M108 47 l-4 14" stroke="#e9a86e" stroke-width="4" stroke-linecap="round"/>
             <g class="eyes">
-              <ellipse cx="78" cy="92" rx="8" ry="10" fill="#3b2416"/>
-              <circle cx="81" cy="88" r="3" fill="#fff"/>
-              <ellipse cx="122" cy="92" rx="8" ry="10" fill="#3b2416"/>
-              <circle cx="125" cy="88" r="3" fill="#fff"/>
+              <g class="look">
+                <ellipse cx="78" cy="92" rx="8" ry="10" fill="#3b2416"/>
+                <circle cx="81" cy="88" r="3" fill="#fff"/>
+                <ellipse cx="122" cy="92" rx="8" ry="10" fill="#3b2416"/>
+                <circle cx="125" cy="88" r="3" fill="#fff"/>
+              </g>
+            </g>
+            <g class="eyes-happy">
+              <path d="M69 95 q9 -11 18 0 M113 95 q9 -11 18 0" stroke="#3b2416" stroke-width="4" fill="none" stroke-linecap="round"/>
             </g>
             <ellipse cx="64" cy="108" rx="10" ry="6" fill="#f7a1b5" opacity=".75"/>
             <ellipse cx="136" cy="108" rx="10" ry="6" fill="#f7a1b5" opacity=".75"/>
@@ -80,13 +87,15 @@
           </defs>
           <rect x="76" y="2" width="11" height="96" rx="5.5" fill="#9cbf7a" stroke="#5f8a43" stroke-width="2" transform="rotate(14 82 50)"/>
           <g clip-path="url(#cupClipStraw)">
-            <rect x="0" y="110" width="140" height="100" fill="#f9c6d3"/>
-            <path d="M0 74 Q 35 66 70 74 T 140 74 V 116 Q 105 106 70 116 T 0 116 Z" fill="#9cbf7a"/>
-            <path d="M0 112 Q 35 104 70 114 T 140 114 V 126 Q 105 118 70 126 T 0 126 Z" fill="#eef3e2"/>
-            <path d="M0 160 Q 35 152 70 160 T 140 160 V 210 H 0 Z" fill="#f4a7bb"/>
-            <circle cx="52" cy="182" r="5" fill="#e8425a" opacity=".55"/><circle cx="88" cy="176" r="4" fill="#e8425a" opacity=".55"/>
-            <rect x="34" y="62" width="26" height="24" rx="6" fill="#fff" opacity=".55" transform="rotate(-12 47 74)"/>
-            <rect x="70" y="76" width="24" height="22" rx="6" fill="#fff" opacity=".5" transform="rotate(15 82 87)"/>
+            <g class="liquid">
+              <rect x="0" y="110" width="140" height="100" fill="#f9c6d3"/>
+              <path d="M0 74 Q 35 66 70 74 T 140 74 V 116 Q 105 106 70 116 T 0 116 Z" fill="#9cbf7a"/>
+              <path d="M0 112 Q 35 104 70 114 T 140 114 V 126 Q 105 118 70 126 T 0 126 Z" fill="#eef3e2"/>
+              <path d="M0 160 Q 35 152 70 160 T 140 160 V 210 H 0 Z" fill="#f4a7bb"/>
+              <circle cx="52" cy="182" r="5" fill="#e8425a" opacity=".55"/><circle cx="88" cy="176" r="4" fill="#e8425a" opacity=".55"/>
+              <rect x="34" y="62" width="26" height="24" rx="6" fill="#fff" opacity=".55" transform="rotate(-12 47 74)"/>
+              <rect x="70" y="76" width="24" height="22" rx="6" fill="#fff" opacity=".5" transform="rotate(15 82 87)"/>
+            </g>
           </g>
           <path d="M22 52 L118 52 L107 196 Q106 202 99 202 L41 202 Q34 202 33 196 Z" fill="rgba(255,255,255,.18)" stroke="#e7c9cf" stroke-width="3" stroke-linejoin="round"/>
           <rect x="18" y="46" width="104" height="9" rx="4.5" fill="#fbeff2" stroke="#e7c9cf" stroke-width="2"/>
@@ -114,8 +123,10 @@
           <svg class="peek-cat cat" data-cat="blackie" viewBox="0 0 160 96" aria-hidden="true">
             <path d="M28 54 L34 6 L62 32 Z" fill="#3a3330"/>
             <path d="M36 44 L39 18 L54 32 Z" fill="#f7a1b5"/>
-            <path d="M132 54 L126 6 L98 32 Z" fill="#3a3330"/>
-            <path d="M124 44 L121 18 L106 32 Z" fill="#f7a1b5"/>
+            <g class="ear ear-r">
+              <path d="M132 54 L126 6 L98 32 Z" fill="#3a3330"/>
+              <path d="M124 44 L121 18 L106 32 Z" fill="#f7a1b5"/>
+            </g>
             <path d="M22 96 Q 22 26 80 24 Q 138 26 138 96 Z" fill="#3a3330"/>
             <g class="peek-eyes">
               <ellipse cx="60" cy="62" rx="12" ry="13" fill="#f6d66b"/>
@@ -126,6 +137,9 @@
                 <circle cx="63" cy="57" r="2.5" fill="#fff"/>
                 <circle cx="103" cy="57" r="2.5" fill="#fff"/>
               </g>
+            </g>
+            <g class="eyes-happy">
+              <path d="M48 66 q12 -14 24 0 M88 66 q12 -14 24 0" stroke="#f6d66b" stroke-width="5" fill="none" stroke-linecap="round"/>
             </g>
             <g class="shades">
               <rect x="42" y="50" width="34" height="22" rx="8" fill="#111"/>
@@ -235,8 +249,10 @@
           <!-- little ears -->
           <path d="M36 70 L42 34 L70 54 Z" fill="#fffaf5" stroke="#e6dccf" stroke-width="3" stroke-linejoin="round"/>
           <path d="M43 62 L46 42 L61 54 Z" fill="#f7a1b5"/>
-          <path d="M120 70 L114 34 L86 54 Z" fill="#fffaf5" stroke="#e6dccf" stroke-width="3" stroke-linejoin="round"/>
-          <path d="M113 62 L110 42 L95 54 Z" fill="#f7a1b5"/>
+          <g class="ear ear-r">
+            <path d="M120 70 L114 34 L86 54 Z" fill="#fffaf5" stroke="#e6dccf" stroke-width="3" stroke-linejoin="round"/>
+            <path d="M113 62 L110 42 L95 54 Z" fill="#f7a1b5"/>
+          </g>
           <!-- fluffy ruff (persian cheeks) -->
           <g fill="#fffaf5" stroke="#e6dccf" stroke-width="3">
             <circle cx="28" cy="104" r="15"/><circle cx="36" cy="122" r="15"/><circle cx="54" cy="134" r="15"/>
@@ -252,6 +268,9 @@
           <!-- flat persian face -->
           <g class="eyes-closed">
             <path d="M54 96 q8 7 16 0 M86 96 q8 7 16 0" stroke="#7d6e62" stroke-width="3" fill="none" stroke-linecap="round"/>
+          </g>
+          <g class="eyes-happy">
+            <path d="M54 99 q8 -9 16 0 M86 99 q8 -9 16 0" stroke="#7d6e62" stroke-width="3" fill="none" stroke-linecap="round"/>
           </g>
           <g class="eyes-open">
             <circle cx="62" cy="95" r="9" fill="#7fb3e6"/><ellipse cx="62" cy="95" rx="4" ry="7" fill="#1d1613"/><circle cx="65" cy="91" r="2.5" fill="#fff"/>
@@ -289,7 +308,7 @@
             <path d="M28 70 L144 70 L136 140 Q134 152 120 152 L52 152 Q38 152 36 140 Z" fill="#fffaf3" stroke="#e3cfb8" stroke-width="3" stroke-linejoin="round"/>
             <path d="M31 96 L141 96 L139 110 L33 110 Z" fill="#a8754d"/>
             <ellipse cx="86" cy="70" rx="58" ry="12" fill="#b07a4f" stroke="#e3cfb8" stroke-width="3"/>
-            <path d="M86 78 C 70 68, 74 58, 82 60 Q 86 62 86 65 Q 86 62 90 60 C 98 58, 102 68, 86 78 Z" fill="#f3e3d1"/>
+            <path class="art" d="M86 78 C 70 68, 74 58, 82 60 Q 86 62 86 65 Q 86 62 90 60 C 98 58, 102 68, 86 78 Z" fill="#f3e3d1"/>
             <g class="cup-face">
               <circle cx="72" cy="124" r="4" fill="#5b4030"/><circle cx="100" cy="124" r="4" fill="#5b4030"/>
               <path d="M80 130 q6 6 12 0" stroke="#5b4030" stroke-width="2.5" fill="none" stroke-linecap="round"/>
@@ -306,12 +325,14 @@
             </defs>
             <rect x="76" y="2" width="11" height="96" rx="5.5" fill="#f6b8c8" stroke="#e37f9c" stroke-width="2" transform="rotate(14 82 50)"/>
             <g clip-path="url(#cupClipRasp)">
-              <rect x="0" y="110" width="140" height="100" fill="#e86b98"/>
-              <path d="M0 74 Q 35 66 70 74 T 140 74 V 116 Q 105 106 70 116 T 0 116 Z" fill="#9cbf7a"/>
-              <path d="M0 112 Q 35 104 70 114 T 140 114 V 126 Q 105 118 70 126 T 0 126 Z" fill="#f3e6ea"/>
-              <path d="M0 160 Q 35 152 70 160 T 140 160 V 210 H 0 Z" fill="#d9467a"/>
-              <rect x="34" y="62" width="26" height="24" rx="6" fill="#fff" opacity=".55" transform="rotate(-12 47 74)"/>
-              <rect x="70" y="76" width="24" height="22" rx="6" fill="#fff" opacity=".5" transform="rotate(15 82 87)"/>
+              <g class="liquid">
+                <rect x="0" y="110" width="140" height="100" fill="#e86b98"/>
+                <path d="M0 74 Q 35 66 70 74 T 140 74 V 116 Q 105 106 70 116 T 0 116 Z" fill="#9cbf7a"/>
+                <path d="M0 112 Q 35 104 70 114 T 140 114 V 126 Q 105 118 70 126 T 0 126 Z" fill="#f3e6ea"/>
+                <path d="M0 160 Q 35 152 70 160 T 140 160 V 210 H 0 Z" fill="#d9467a"/>
+                <rect x="34" y="62" width="26" height="24" rx="6" fill="#fff" opacity=".55" transform="rotate(-12 47 74)"/>
+                <rect x="70" y="76" width="24" height="22" rx="6" fill="#fff" opacity=".5" transform="rotate(15 82 87)"/>
+              </g>
             </g>
             <path d="M22 52 L118 52 L107 196 Q106 202 99 202 L41 202 Q34 202 33 196 Z" fill="rgba(255,255,255,.18)" stroke="#e7c9cf" stroke-width="3" stroke-linejoin="round"/>
             <rect x="18" y="46" width="104" height="9" rx="4.5" fill="#fbeff2" stroke="#e7c9cf" stroke-width="2"/>

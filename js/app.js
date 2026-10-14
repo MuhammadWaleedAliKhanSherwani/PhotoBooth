@@ -148,6 +148,38 @@
   function chime() {
     [784, 988, 1175, 1568].forEach((f, i) => setTimeout(() => beep(f, 0.25, 'triangle', 0.08), i * 90));
   }
+  /** low rumbly purr: lowpassed noise pulsing ~24 times a second */
+  let purrUntil = 0;
+  function purr() {
+    if (!state.sound) return;
+    const a = ac(); if (!a) return;
+    const t = a.currentTime;
+    if (t < purrUntil) return;
+    const dur = 1.3;
+    purrUntil = t + dur * 0.8;
+    const len = Math.floor(a.sampleRate * dur);
+    const buf = a.createBuffer(1, len, a.sampleRate);
+    const data = buf.getChannelData(0);
+    for (let i = 0; i < len; i++) data[i] = Math.random() * 2 - 1;
+    const src = a.createBufferSource();
+    src.buffer = buf;
+    const lp = a.createBiquadFilter();
+    lp.type = 'lowpass';
+    lp.frequency.value = 300;
+    const pulse = a.createGain(), lfo = a.createOscillator(), depth = a.createGain();
+    pulse.gain.value = 0.5;
+    depth.gain.value = 0.5;
+    lfo.frequency.value = 24;
+    lfo.connect(depth).connect(pulse.gain);
+    const env = a.createGain();
+    env.gain.setValueAtTime(0.0001, t);
+    env.gain.exponentialRampToValueAtTime(0.4, t + 0.2);
+    env.gain.setValueAtTime(0.4, t + dur - 0.4);
+    env.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+    src.connect(lp).connect(pulse).connect(env).connect(a.destination);
+    src.start(t); lfo.start(t);
+    src.stop(t + dur); lfo.stop(t + dur);
+  }
 
   /* ---------------- little UI helpers ---------------- */
   let toastTimer;
@@ -156,6 +188,22 @@
     els.toast.classList.add('show');
     clearTimeout(toastTimer);
     toastTimer = setTimeout(() => els.toast.classList.remove('show'), ms);
+  }
+
+  /** a speech bubble next to a cat or a drink */
+  function bubble(el, text, ms = 2600) {
+    const host = el.closest('.cat-spot, .drink, .camera-wrap');
+    if (!host) return toast(text);
+    let b = host.querySelector(':scope > .bubble');
+    if (!b) {
+      b = document.createElement('div');
+      b.className = 'bubble';
+      host.appendChild(b);
+    }
+    b.textContent = text;
+    requestAnimationFrame(() => b.classList.add('show'));
+    clearTimeout(b._t);
+    b._t = setTimeout(() => b.classList.remove('show'), ms);
   }
 
   function heartsBurst(x, y, n = 8) {
@@ -566,6 +614,12 @@
     state.busy = on;
     document.body.classList.toggle('shooting', on);
     $('#btn-snap').disabled = on;
+    updateLooks();
+  }
+
+  /** every cat hops when the shutter goes off */
+  function catsHop() {
+    $$('.cat').forEach((c, i) => setTimeout(() => bounce(c), 80 + i * 110));
   }
 
   async function startSession() {
@@ -586,10 +640,13 @@
         if (!(await countdown(state.timer))) throw new Error('cancelled');
         flash();
         shutterSound();
+        catsHop();
         const frame = grabFrame();
         shots.push(frame);
-        const thumb = makeCanvas(96, (96 * frame.height) / frame.width);
-        thumb.getContext('2d').drawImage(frame, 0, 0, thumb.width, thumb.height);
+        // tray thumbnail looks like the print: same crop as the slot, same filter
+        const slot = slotForShot(L, i);
+        const thumb = makeCanvas(96, Math.round((96 * slot.h) / slot.w));
+        renderFiltered(frame, frame.width, frame.height, thumb.width, thumb.height, curFilter(), { target: thumb, seed: 1 });
         els.tray.appendChild(thumb);
         await wait(450);
       }
@@ -1244,12 +1301,18 @@
 
   /* ---------------- modals ---------------- */
   function openModal(m) {
+    m._returnFocus = document.activeElement;
     m.hidden = false;
-    requestAnimationFrame(() => m.classList.add('open'));
+    requestAnimationFrame(() => {
+      m.classList.add('open');
+      m.querySelector('[data-close]')?.focus({ preventScroll: true });
+    });
   }
   function closeModal(m) {
     m.classList.remove('open');
     setTimeout(() => { m.hidden = true; }, 200);
+    if (m._returnFocus?.isConnected) m._returnFocus.focus({ preventScroll: true });
+    if (m === els.resultModal) setTimeout(() => bubble(peek, pick(PROUD_LINES)), 350);
   }
   $$('.modal').forEach((m) => {
     m.addEventListener('click', (e) => {
@@ -1258,53 +1321,120 @@
   });
 
   /* ---------------- cats & cuteness ---------------- */
-  function bounce(el) {
-    el.classList.remove('bounce');
+  /** restart a one-shot CSS animation class */
+  function retrigger(el, cls) {
+    el.classList.remove(cls);
     void el.getBoundingClientRect();
-    el.classList.add('bounce');
+    el.classList.add(cls);
   }
+  const bounce = (el) => retrigger(el, 'bounce');
 
   const CAT_LINES = {
-    miso: ['Miso says mrrp ♡', 'Miso wants a strawberry matcha too 🍓🍵', 'Miso approves this photoshoot', 'Miso is doing the slow blink at you'],
-    gina: ['Gina woke up… and went right back to sleep 😴', 'Gina, the fluffiest princess 👑', 'Gina demands chin scratches', 'Gina is too fluffy to function'],
-    blackie: ['Blackie is watching you 👀', 'Blackie says: pose harder', 'Blackie is plotting to steal the hazelnut latte ☕', 'Blackie thinks you look cute today'],
+    miso: ['mrrp ♡', 'I want a strawberry matcha too 🍓🍵', 'I approve this photoshoot', '*slow blink* (that means I love you)', 'psst… try stroking me'],
+    gina: ['five more minutes… 😴', 'the fluffiest princess has awoken 👑', 'chin scratches. now.', 'too fluffy to function', 'was I in the photo? I should be in the photo'],
+    blackie: ["I'm watching you 👀", 'pose harder', "I'm plotting to steal the hazelnut latte ☕", 'you look cute today', 'my eyes go big when the timer starts 👁👁'],
   };
+  const PET_LINES = {
+    miso: ['prrrrr ♡', 'more pets please', 'right behind the ears ♡'],
+    gina: ['prrr… zzz…', 'acceptable. continue.', "don't stop 😌"],
+    blackie: ['…fine, you can pet me', 'prrr 🖤', 'okay maybe I like you'],
+  };
+  const PROUD_LINES = ['that one was SO cute', '10/10, framing it', 'did you see my pose?', 'again! again!', 'the cats have voted: iconic'];
+
   $$('.cat').forEach((cat) => {
     cat.addEventListener('click', (e) => {
       bounce(cat);
       mew();
       heartsBurst(e.clientX, e.clientY);
-      if (CAT_LINES[cat.dataset.cat]) toast(pick(CAT_LINES[cat.dataset.cat]));
+      bubble(cat, pick(CAT_LINES[cat.dataset.cat]));
       if (cat.classList.contains('cat-loaf')) {
         cat.classList.add('awake');
         clearTimeout(cat._sleep);
         cat._sleep = setTimeout(() => cat.classList.remove('awake'), 2600);
       }
     });
+
+    // petting: stroke across a cat (mouse or finger) and it purrs with happy eyes
+    let rub = 0, last = 0, prev = null;
+    cat.addEventListener('pointermove', (e) => {
+      const now = performance.now();
+      if (now - last > 350 || !prev) rub = 0;
+      if (prev) rub += Math.hypot(e.clientX - prev[0], e.clientY - prev[1]);
+      prev = [e.clientX, e.clientY];
+      last = now;
+      if (rub > 260) { rub = 0; pet(cat, e); }
+    });
+    cat.addEventListener('pointerleave', () => { prev = null; });
   });
+
+  function pet(cat, e) {
+    const first = !cat.classList.contains('petted');
+    cat.classList.add('petted');
+    clearTimeout(cat._pet);
+    cat._pet = setTimeout(() => cat.classList.remove('petted'), 1500);
+    heartsBurst(e.clientX, e.clientY, 3);
+    purr();
+    if (first) bubble(cat, pick(PET_LINES[cat.dataset.cat]), 1800);
+  }
+
+  const SIPS = 4;
+  const DRINK_LINES = {
+    strawberry: ['sip sip 🍓🍵', 'extra pink, extra yummy', 'strawberry matcha supremacy'],
+    raspberry: ['tangy & cute, just like you 💗', 'raspberry matcha hits different', 'sip 🍵💗'],
+    hazelnut: ['one hazelnut latte, extra love ☕', '*stirs the heart*', 'warm & toasty ♡'],
+  };
   $$('.latte').forEach((cup) => cup.addEventListener('click', (e) => {
     bounce(cup);
-    beep(660, 0.08, 'sine', 0.08);
-    setTimeout(() => beep(990, 0.12, 'sine', 0.08), 80);
     heartsBurst(e.clientX, e.clientY, 6);
-    toast({
-      strawberry: 'sip sip 🍓🍵 strawberry matcha, extra pink',
-      raspberry: 'raspberry matcha 💗🍵 tangy & cute, just like you',
-      hazelnut: 'one hazelnut latte, extra love ☕',
-    }[cup.dataset.drink]);
+    const liquid = cup.querySelector('.liquid');
+    if (!liquid) {
+      retrigger(cup, 'stir');
+      beep(660, 0.08, 'sine', 0.08);
+      setTimeout(() => beep(990, 0.12, 'sine', 0.08), 80);
+      return bubble(cup, pick(DRINK_LINES[cup.dataset.drink]));
+    }
+    const sips = Number(cup.dataset.sips || 0);
+    if (sips >= SIPS) return; // refilling
+    cup.dataset.sips = sips + 1;
+    cup.style.setProperty('--sip', sips + 1);
+    beep(520 - sips * 60, 0.1, 'sine', 0.08); // each sip a little lower
+    if (sips + 1 < SIPS) return bubble(cup, pick(DRINK_LINES[cup.dataset.drink]));
+    bubble(cup, 'all gone! refilling… 🧋');
+    setTimeout(() => {
+      cup.dataset.sips = 0;
+      cup.style.setProperty('--sip', 0);
+      [523, 659, 784].forEach((f, i) => setTimeout(() => beep(f, 0.12, 'triangle', 0.07), i * 90));
+    }, 1600);
   }));
 
-  // the black cat on top of the camera watches your cursor 👀
-  const pupils = $('.peek-cat .pupils');
+  // eyes follow your cursor 👀 — and fix on the camera while it's shooting
   const peek = $('.peek-cat');
+  const lookers = [
+    { el: $('.peek-cat .pupils'), box: peek, cy: 0.6, max: 5 },
+    { el: $('.cat-sit .look'), box: $('.cat-sit'), cy: 0.35, max: 4 },
+  ];
+  let pointer = null;
+  function updateLooks() {
+    let target = pointer;
+    if (state.busy) {
+      const r = els.preview.getBoundingClientRect();
+      target = [r.left + r.width / 2, r.top + r.height / 2];
+    }
+    if (!target) return;
+    lookers.forEach(({ el, box, cy, max }) => {
+      const r = box.getBoundingClientRect();
+      if (!r.width) return;
+      const dx = target[0] - (r.left + r.width / 2);
+      const dy = target[1] - (r.top + r.height * cy);
+      const d = Math.hypot(dx, dy) || 1;
+      const m = Math.min(max, d / 40);
+      el.style.transform = `translate(${(dx / d) * m}px, ${(dy / d) * m * 0.7}px)`;
+    });
+  }
   window.addEventListener('pointermove', (e) => {
-    const r = peek.getBoundingClientRect();
-    const dx = e.clientX - (r.left + r.width / 2);
-    const dy = e.clientY - (r.top + r.height * 0.6);
-    const d = Math.hypot(dx, dy) || 1;
-    const m = Math.min(5, d / 40);
-    pupils.style.transform = `translate(${(dx / d) * m}px, ${(dy / d) * m * 0.7}px)`;
-  });
+    pointer = [e.clientX, e.clientY];
+    if (!state.busy) updateLooks();
+  }, { passive: true });
 
   function buildFloaties() {
     const box = $('#floaties');
